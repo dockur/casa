@@ -117,7 +117,7 @@ RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -generate types,client -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
 
-    
+
 COPY ./CasaOS-AppManagement/build ./build
 COPY ./CasaOS-AppManagement/service ./service
 COPY ./CasaOS-AppManagement/route ./route
@@ -155,7 +155,7 @@ RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -generate types,client -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
 
-    
+
 COPY ./CasaOS-LocalStorage/build ./build
 COPY ./CasaOS-LocalStorage/cmd ./cmd
 COPY ./CasaOS-LocalStorage/common ./common
@@ -215,7 +215,7 @@ RUN mkdir -p codegen && \
 RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -generate types,client -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
-    
+
 COPY ./CasaOS/build ./build
 COPY ./CasaOS/cmd ./cmd
 COPY ./CasaOS/common ./common
@@ -339,12 +339,13 @@ COPY ./CasaOS-AppStore/*.json /var/lib/casaos/appstore/default/
 
 # Copy the Pre-built binary file and configuration files from the main
 COPY --from=builder-casaos-main /app/casaos-main .
-#COPY --from=builder-casaos-main /etc/casaos/casaos.conf /etc/casaos/casaos.conf
+COPY --from=builder-casaos-main /app/build/sysroot/usr/share/casaos/shell/ /usr/share/casaos/shell
+RUN chmod +x /usr/share/casaos/shell/*.sh
+
 COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
 
 # Copy the Pre-built binary file from the cli
 COPY --from=builder-casaos-cli /app/casaos-cli .
-
 COPY --chmod=755 ./entrypoint.sh ./entrypoint.sh
 
 # Expose port 8080 to the outside world
@@ -352,5 +353,3 @@ EXPOSE 8080
 
 # Command to run the executable
 ENTRYPOINT ["/usr/bin/tini", "-s", "/root/entrypoint.sh"]
-
-#Note persistent volume to be mounted on /root/DATA
