@@ -40,15 +40,6 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
       - 
-        name: Check working space directory
-        run: du ${GITHUB_WORKSPACE} -h -d 1
-      - 
-        name: Get more space
-        run: |
-          df . -h
-          sudo rm -rf ${GITHUB_WORKSPACE}/.git
-          df . -h
-      -
         name: Docker metadata
         if: env.exists == 'false'
         id: meta
