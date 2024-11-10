@@ -186,7 +186,7 @@ COPY ./CasaOS-UI/.yarnrc.yml .
 COPY ./CasaOS-UI/.yarn ./.yarn
 COPY ./CasaOS-UI/main/package.json ./main/package.json
 
-RUN yarn install
+RUN yarn install --pure-lockfile --network-timeout 1000000 && yarn cache clean
 
 COPY ./CasaOS-UI .
 RUN yarn build
