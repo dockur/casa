@@ -294,9 +294,11 @@ RUN set -eu \
 
 # Set environment variables
 ENV GO_ENV=production
+
+ENV REF_PORT=
+ENV REF_DOMAIN=
 ENV REF_SEPARATOR=-
-ENV REF_SCHEME=https
-ENV REF_PORT=443
+ENV REF_SCHEME=http
 
 # Set the Current Working Directory inside the container
 WORKDIR /root/
