@@ -28,7 +28,7 @@ services:
     image: dockurr/casaos
     container_name: casaos
     ports:
-      - 80:80
+      - 8080:8080
     volumes:
       - "/home/example:/DATA"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -38,7 +38,7 @@ services:
 Via Docker CLI:
 
 ```bash
-docker run -it --rm -p 80:80 -v /home/example:/DATA -v /var/run/docker.sock:/var/run/docker.sock --stop-timeout 60 dockurr/casaos
+docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:/var/run/docker.sock --stop-timeout 60 dockurr/casaos
 ```
 
 ## FAQ 💬
