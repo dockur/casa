@@ -4,4 +4,13 @@
 .github
 .gitignore
 .gitmodules
+.vscode
+.dockerignore
+Dockerfile
+Dockerfile.archive
+compose.yml
+docker-compose.yml
+renovate.json
+
+*.md
 *.ps1
