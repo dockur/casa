@@ -1,5 +1,5 @@
 <div align="center">
-<a href="https://github.com/dockur/casaos"><img src="https://raw.githubusercontent.com/dockur/casaos/master/.github/logo.png" title="Logo" style="max-width:100%;" width="400" /></a>
+<a href="https://github.com/dockur/casaos"><img src="https://raw.githubusercontent.com/dockur/casa/master/.github/logo.png" title="Logo" style="max-width:100%;" width="400" /></a>
 </div>
 <div align="center">
 
@@ -24,8 +24,8 @@ Via Docker Compose:
 ```yaml
 services:
   casaos:
-    image: dockurr/casaos
-    container_name: casaos
+    image: dockurr/casa
+    container_name: casa
     ports:
       - 8080:8080
     volumes:
@@ -37,13 +37,13 @@ services:
 Via Docker CLI:
 
 ```bash
-docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:/var/run/docker.sock --stop-timeout 60 dockurr/casaos
+docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:/var/run/docker.sock --stop-timeout 60 dockurr/casa
 ```
 
 ## Screenshot 📸
 
 <div align="center">
-<a href="https://github.com/dockur/casaos"><img src="https://raw.githubusercontent.com/dockur/casaos/master/.github/screen.png" title="Screenshot" style="max-width:100%;" width="256" /></a>
+<a href="https://github.com/dockur/casa"><img src="https://raw.githubusercontent.com/dockur/casaos/master/.github/screen.png" title="Screenshot" style="max-width:100%;" width="256" /></a>
 </div>
 
 ## FAQ 💬
@@ -60,16 +60,16 @@ docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:
   Replace the example path `/home/example` with the desired storage folder.
 
 ## Stars 🌟
-[![Stars](https://starchart.cc/dockur/casaos.svg?variant=adaptive)](https://starchart.cc/dockur/casaos)
+[![Stars](https://starchart.cc/dockur/casa.svg?variant=adaptive)](https://starchart.cc/dockur/casa)
 
-[build_url]: https://github.com/dockur/casaos/
-[hub_url]: https://hub.docker.com/r/dockurr/casaos
-[tag_url]: https://hub.docker.com/r/dockurr/casaos/tags
-[pkg_url]: https://github.com/dockur/casaos/pkgs/container/casaos
+[build_url]: https://github.com/dockur/casa/
+[hub_url]: https://hub.docker.com/r/dockurr/casa
+[tag_url]: https://hub.docker.com/r/dockurr/casa/tags
+[pkg_url]: https://github.com/dockur/casaos/pkgs/container/casa
 
-[Build]: https://github.com/dockur/casaos/actions/workflows/build.yml/badge.svg
-[Size]: https://img.shields.io/docker/image-size/dockurr/casaos/latest?color=066da5&label=size
-[Pulls]: https://img.shields.io/docker/pulls/dockurr/casaos.svg?style=flat&label=pulls&logo=docker
-[Version]: https://img.shields.io/docker/v/dockurr/casaos/latest?arch=amd64&sort=semver&color=066da5
-[Package]:https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fipitio.github.io%2Fbackage%2Fdockur%2Fcasaos%2Fcasaos.json&query=%24.downloads&logo=github&style=flat&color=066da5&label=pulls
+[Build]: https://github.com/dockur/casa/actions/workflows/build.yml/badge.svg
+[Size]: https://img.shields.io/docker/image-size/dockurr/casa/latest?color=066da5&label=size
+[Pulls]: https://img.shields.io/docker/pulls/dockurr/casa.svg?style=flat&label=pulls&logo=docker
+[Version]: https://img.shields.io/docker/v/dockurr/casa/latest?arch=amd64&sort=semver&color=066da5
+[Package]:https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fipitio.github.io%2Fbackage%2Fdockur%2Fcasa%2Fcasa.json&query=%24.downloads&logo=github&style=flat&color=066da5&label=pulls
 
