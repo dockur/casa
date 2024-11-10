@@ -269,21 +269,31 @@ RUN go build -o casaos-cli .
 ############################################################################################################
 # Build the final image
 ############################################################################################################
-FROM ubuntu:24.04
 
-# Install required packages
-RUN apt-get update && apt-get install -y wget curl smartmontools parted ntfs-3g net-tools udevil samba cifs-utils mergerfs unzip openssh-server
+FROM debian:bookworm-slim AS casaos
 
-# install docker https://docs.docker.com/engine/install/ubuntu/
-RUN curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
+ARG TARGETARCH
+ARG VERSION_ARG="0.0"
+ARG DEBCONF_NOWARNINGS="yes"
+ARG DEBIAN_FRONTEND="noninteractive"
+ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 
+RUN set -eu \
+  && apt-get update -y \
+  && apt-get --no-install-recommends -y install jq tini wget curl smartmontools parted ntfs-3g net-tools udevil samba cifs-utils mergerfs unzip openssh-server \
+  && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+  && apt-get update -y \
+  && apt-get --no-install-recommends -y install docker-ce-cli docker-compose-plugin \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+  && echo "$VERSION_ARG" > /run/version
 
 # Set environment variables
 ENV GO_ENV=production
 ENV REF_SEPARATOR=-
 ENV REF_SCHEME=https
 ENV REF_PORT=443
-
 
 # Set the Current Working Directory inside the container
 WORKDIR /root/
@@ -293,7 +303,6 @@ COPY --from=builder-casaos-gateway /app/casaos-gateway .
 #COPY --from=builder-casaos-gateway /etc/casaos/gateway.ini /etc/casaos/gateway.ini
 COPY ./conf/gateway/gateway.ini /etc/casaos/gateway.ini
 COPY --from=builder-casaos-gateway /var/run/casaos/routes.json /var/run/casaos/routes.json
-
 
 # Copy the Pre-built binary file and configuration files from the app-management
 COPY --from=builder-casaos-app-management /app/casaos-app-management .
@@ -318,8 +327,7 @@ COPY ./conf/local-storage/local-storage.conf /etc/casaos/local-storage.conf
 
 #COPY ui /var/lib/casaos/www and other initial files
 COPY --from=builder-casaos-ui /app/build/sysroot/var/lib/casaos/ /var/lib/casaos/
-COPY ./CasaOS-UI/main/register-ui-events.sh ./register-ui-events.sh
-RUN chmod +x ./register-ui-events.sh
+COPY --chmod=755 ./CasaOS-UI/main/register-ui-events.sh ./register-ui-events.sh
 
 # Copy CasaOS-AppStore
 #COPY ./appstore-data/main/build/sysroot/var/lib/casaos/appstore/default.new /var/lib/casaos/appstore/default
@@ -334,13 +342,12 @@ COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
 # Copy the Pre-built binary file from the cli
 COPY --from=builder-casaos-cli /app/casaos-cli .
 
-COPY ./entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
+COPY --chmod=755 ./entrypoint.sh ./entrypoint.sh
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
 # Command to run the executable
-ENTRYPOINT ["/root/entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tini", "-s", "/root/entrypoint.sh"]
 
 #Note persistent volume to be mounted on /root/DATA
