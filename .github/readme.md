@@ -1,6 +1,5 @@
-<h1 align="center">CasaOS<br />
 <div align="center">
-<a href="https://github.com/dockur/casaos"><img src="https://raw.githubusercontent.com/dockur/casaos/master/.github/logo.png" title="Logo" style="max-width:100%;" width="128" /></a>
+<a href="https://github.com/dockur/casaos"><img src="https://raw.githubusercontent.com/dockur/casaos/master/.github/logo.png" title="Logo" style="max-width:100%;" width="512" /></a>
 </div>
 <div align="center">
 
