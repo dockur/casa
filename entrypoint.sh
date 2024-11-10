@@ -11,7 +11,7 @@ trap 'error "Status $? while: $BASH_COMMAND (line $LINENO/$BASH_LINENO)"' ERR
 [ "$(id -u)" -ne "0" ] && error "Script must be executed with root privileges." && exit 12
 
 echo "❯ Starting CasaOS for Docker v$(</run/version)..."
-echo "❯ For support visit https://github.com/dockur/casaos/issues"
+echo "❯ For support visit https://github.com/dockur/casa/issues"
 
 if [ ! -S /var/run/docker.sock ]; then
   error "Docker socket is missing? Please bind /var/run/docker.sock in your compose file." && exit 13
