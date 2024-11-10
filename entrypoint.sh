@@ -36,9 +36,6 @@ if [[ "$mount" != "/DATA" ]]; then
   ln -s /DATA "$mount"
 fi
 
-export REF_PORT=""
-export REF_DOMAIN=""
-export REF_SCHEME="http"
 export DATA_ROOT="$mount"
 
 # Create directories
