@@ -41,6 +41,12 @@ Via Docker CLI:
 docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:/var/run/docker.sock --stop-timeout 60 dockurr/casaos
 ```
 
+## Screenshot 📸
+
+<div align="center">
+<a href="https://github.com/dockur/casaos"><img src="https://raw.githubusercontent.com/dockur/casaos/master/.github/screen.png" title="Screenshot" style="max-width:100%;" width="256" /></a>
+</div>
+
 ## FAQ 💬
 
 ### How do I change the storage location?
