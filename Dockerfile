@@ -1,7 +1,7 @@
 ############################################################################################################
 # Build the Go binary for the Gateway
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-gateway
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-gateway
 
 WORKDIR /app
 
@@ -18,7 +18,8 @@ COPY ./CasaOS-Gateway/service ./service
 COPY ./CasaOS-Gateway/build ./build
 COPY ./CasaOS-Gateway/main.go ./main.go
 
-RUN go build -o casaos-gateway .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-gateway .
 
 # default config
 COPY ./CasaOS-Gateway/build/sysroot/etc/casaos/gateway.ini.sample /etc/casaos/gateway.ini
@@ -27,7 +28,7 @@ RUN mkdir -p /var/run/casaos/ && echo -n "{}" >> /var/run/casaos/routes.json
 ############################################################################################################
 # Build the Go binary for the User Service
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-user-service
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-user-service
 
 WORKDIR /app
 
@@ -46,7 +47,6 @@ RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
 
-
 COPY ./CasaOS-UserService/build ./build
 COPY ./CasaOS-UserService/cmd ./cmd
 COPY ./CasaOS-UserService/common ./common
@@ -56,7 +56,8 @@ COPY ./CasaOS-UserService/route ./route
 COPY ./CasaOS-UserService/service ./service
 COPY ./CasaOS-UserService/main.go ./main.go
 
-RUN go build -o casaos-user-service .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-user-service .
 
 # default config
 COPY ./CasaOS-UserService/build/sysroot/etc/casaos/user-service.conf.sample /etc/casaos/user-service.conf
@@ -64,7 +65,7 @@ COPY ./CasaOS-UserService/build/sysroot/etc/casaos/user-service.conf.sample /etc
 ############################################################################################################
 # Build the Go binary for the MessageBus
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-message-bus
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-message-bus
 
 WORKDIR /app
 
@@ -90,7 +91,8 @@ COPY ./CasaOS-MessageBus/route ./route
 COPY ./CasaOS-MessageBus/service ./service
 COPY ./CasaOS-MessageBus/main.go ./main.go
 
-RUN go build -o casaos-message-bus .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-message-bus .
 
 # default config
 COPY ./CasaOS-MessageBus/build/sysroot/etc/casaos/message-bus.conf.sample /etc/casaos/message-bus.conf
@@ -98,7 +100,7 @@ COPY ./CasaOS-MessageBus/build/sysroot/etc/casaos/message-bus.conf.sample /etc/c
 ############################################################################################################
 # Build the Go binary for the AppManagement
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-app-management
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-app-management
 
 WORKDIR /app
 
@@ -117,7 +119,6 @@ RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -generate types,client -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
 
-
 COPY ./CasaOS-AppManagement/build ./build
 COPY ./CasaOS-AppManagement/service ./service
 COPY ./CasaOS-AppManagement/route ./route
@@ -127,7 +128,8 @@ COPY ./CasaOS-AppManagement/common ./common
 COPY ./CasaOS-AppManagement/cmd ./cmd
 COPY ./CasaOS-AppManagement/main.go ./main.go
 
-RUN go build -o casaos-app-management .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-app-management .
 
 # default config
 COPY ./CasaOS-AppManagement/build/sysroot/etc/casaos/app-management.conf.sample /etc/casaos/app-management.conf
@@ -136,7 +138,7 @@ COPY ./CasaOS-AppManagement/build/sysroot/etc/casaos/env /etc/casaos/env
 ############################################################################################################
 # Build the Go binary for the LocalStorage
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-local-storage
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-local-storage
 
 WORKDIR /app
 
@@ -168,7 +170,8 @@ COPY ./CasaOS-LocalStorage/service ./service
 COPY ./CasaOS-LocalStorage/main.go ./main.go
 COPY ./CasaOS-LocalStorage/misc.go ./misc.go
 
-RUN go build -o casaos-local-storage .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-local-storage .
 
 # default config
 COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /etc/casaos/local-storage.conf
@@ -176,7 +179,7 @@ COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /e
 ############################################################################################################
 # Build the Go binary for the UI
 ############################################################################################################
-FROM node:16 AS builder-casaos-ui
+FROM --platform=$BUILDPLATFORM node:16 AS builder-casaos-ui
 
 ENV NODE_ENV=production
 
@@ -197,7 +200,7 @@ RUN yarn build
 ############################################################################################################
 # Build the Go binary for the CasaOS Main
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-main
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-main
 
 WORKDIR /app
 
@@ -229,7 +232,8 @@ COPY ./CasaOS/service ./service
 COPY ./CasaOS/types ./types
 COPY ./CasaOS/main.go ./main.go
 
-RUN go build -o casaos-main .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-main .
 
 # default config
 COPY ./CasaOS/build/sysroot/etc/casaos/casaos.conf.sample /etc/casaos/casaos.conf
@@ -237,7 +241,7 @@ COPY ./CasaOS/build/sysroot/etc/casaos/casaos.conf.sample /etc/casaos/casaos.con
 ############################################################################################################
 # Build the Go binary for the CasaOS Cli
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-cli
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-cli
 
 WORKDIR /app
 
@@ -267,7 +271,8 @@ COPY ./CasaOS-CLI/build ./build
 COPY ./CasaOS-CLI/cmd ./cmd
 COPY ./CasaOS-CLI/main.go ./main.go
 
-RUN go build -o casaos-cli .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-cli .
 
 ############################################################################################################
 # Build the final image
