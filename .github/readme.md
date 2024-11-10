@@ -1,5 +1,5 @@
 <div align="center">
-<a href="https://github.com/dockur/casaos"><img src="https://raw.githubusercontent.com/dockur/casa/master/.github/logo.png" title="Logo" style="max-width:100%;" width="400" /></a>
+<a href="https://github.com/dockur/casa"><img src="https://raw.githubusercontent.com/dockur/casa/master/.github/logo.png" title="Logo" style="max-width:100%;" width="400" /></a>
 </div>
 <div align="center">
 
@@ -23,7 +23,7 @@ Via Docker Compose:
 
 ```yaml
 services:
-  casaos:
+  casa:
     image: dockurr/casa
     container_name: casa
     ports:
@@ -43,7 +43,7 @@ docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:
 ## Screenshot 📸
 
 <div align="center">
-<a href="https://github.com/dockur/casa"><img src="https://raw.githubusercontent.com/dockur/casaos/master/.github/screen.png" title="Screenshot" style="max-width:100%;" width="256" /></a>
+<a href="https://github.com/dockur/casa"><img src="https://raw.githubusercontent.com/dockur/casa/master/.github/screen.png" title="Screenshot" style="max-width:100%;" width="256" /></a>
 </div>
 
 ## FAQ 💬
@@ -65,7 +65,7 @@ docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:
 [build_url]: https://github.com/dockur/casa/
 [hub_url]: https://hub.docker.com/r/dockurr/casa
 [tag_url]: https://hub.docker.com/r/dockurr/casa/tags
-[pkg_url]: https://github.com/dockur/casaos/pkgs/container/casa
+[pkg_url]: https://github.com/dockur/casa/pkgs/container/casa
 
 [Build]: https://github.com/dockur/casa/actions/workflows/build.yml/badge.svg
 [Size]: https://img.shields.io/docker/image-size/dockurr/casa/latest?color=066da5&label=size
