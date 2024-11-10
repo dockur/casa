@@ -11,7 +11,7 @@
 
 </div></h1>
 
-Docker container of [CasaOS](https://casaos.zimaspace.com/) (an OS for self-hosting).
+Docker container of [CasaOS](https://casaos.io/) (an OS for self-hosting).
 
 ## Features ✨
 
