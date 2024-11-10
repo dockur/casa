@@ -1,7 +1,57 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
+if [ ! -S /var/run/docker.sock ]; then
+  echo "ERROR: Docker socket is missing? Please bind /var/run/docker.sock in your compose file." && exit 13
+fi
+
+: "${REF_NET:="meta"}"
+
+if ! docker network inspect "$REF_NET" &>/dev/null; then
+  if ! docker network create --driver=bridge --subnet="10.21.0.0/16" "$REF_NET" >/dev/null; then
+    echo "ERROR: Failed to create network '$REF_NET'!" && exit 14
+  fi
+  if ! docker network inspect "$REF_NET" &>/dev/null; then
+    echo "ERROR: Network '$REF_NET' does not exist?" && exit 15
+  fi
+fi
+
+target=$(hostname)
+
+if ! docker inspect "$target" &>/dev/null; then
+  echo "ERROR: Failed to find a container with name '$target'!" && exit 16
+fi
+
+resp=$(docker inspect "$target")
+network=$(echo "$resp" | jq -r '.[0].NetworkSettings.Networks["$REF_NET"]')
+
+if [ -z "$network" ] || [[ "$network" == "null" ]]; then
+  if ! docker network connect "$REF_NET" "$target"; then
+    echo "ERROR: Failed to connect container to network '$REF_NET'!" && exit 17
+  fi
+fi
+
+mount=$(echo "$resp" | jq -r '.[0].Mounts[] | select(.Destination == "/DATA").Source')
+
+if [ -z "$mount" ] || [[ "$mount" == "null" ]] || [ ! -d "/DATA" ]; then
+  echo "ERROR: You did not bind the /DATA folder!" && exit 18
+fi
+
+# Convert Windows paths to Linux path
+if [[ "$mount" == *":\\"* ]]; then
+  mount="${mount,,}"
+  mount="${mount//\\//}"
+  mount="//${mount/:/}"
+fi
+
+if [[ "$mount" != "/"* ]]; then
+  echo "ERROR: Please bind the /DATA folder to an absolute path!" && exit 19
+fi
+
+export DATA_ROOT="$mount"
+
+# Create directories
 mkdir -p /DATA/AppData/casaos
-
 
 mkdir -p /var/log
 touch /var/log/casaos-gateway.log
