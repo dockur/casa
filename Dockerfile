@@ -178,6 +178,8 @@ COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /e
 ############################################################################################################
 FROM node:16 AS builder-casaos-ui
 
+ENV NODE_ENV=production
+
 WORKDIR /app
 
 COPY ./CasaOS-UI/package.json .
@@ -186,9 +188,10 @@ COPY ./CasaOS-UI/.yarnrc.yml .
 COPY ./CasaOS-UI/.yarn ./.yarn
 COPY ./CasaOS-UI/main/package.json ./main/package.json
 
-RUN yarn install --pure-lockfile --network-timeout 1000000 && yarn cache clean
+RUN yarn install --network-timeout 1000000
 
 COPY ./CasaOS-UI .
+
 RUN yarn build
 
 ############################################################################################################
