@@ -1,36 +1,53 @@
 [submodule "CasaOS"]
-	path = CasaOS
-	url = https://github.com/worph/CasaOS.git
-	branch = main
+    path = CasaOS
+	url = https://github.com/IceWhaleTech/CasaOS.git
+	branch = v0.4.13
+    update = checkout
+
 [submodule "CasaOS-AppManagement"]
-	path = CasaOS-AppManagement
-	url = https://github.com/worph/CasaOS-AppManagement.git
-	branch = next
+    path = CasaOS-AppManagement
+    url = https://github.com/worph/CasaOS-AppManagement.git
+    branch = casa-img
+    update = merge
+
 [submodule "CasaOS-AppStore"]
-	path = CasaOS-AppStore
-	url = https://github.com/worph/CasaOS-AppStore.git
-	branch = main
+    path = CasaOS-AppStore
+    url = https://github.com/IceWhaleTech/CasaOS-AppStore.git
+    branch = main
+    update = checkout
+
 [submodule "CasaOS-Gateway"]
-	path = CasaOS-Gateway
-	url = https://github.com/worph/CasaOS-Gateway.git
-	branch = main
+    path = CasaOS-Gateway
+    url = https://github.com/IceWhaleTech/CasaOS-Gateway.git
+	branch = v0.4.8
+    update = checkout
+
 [submodule "CasaOS-LocalStorage"]
-	path = CasaOS-LocalStorage
-	url = https://github.com/worph/CasaOS-LocalStorage.git
-	branch = main
+    path = CasaOS-LocalStorage
+    url = https://github.com/IceWhaleTech/CasaOS-LocalStorage.git
+	branch = v0.4.5-2
+    update = checkout
+
 [submodule "CasaOS-MessageBus"]
-	path = CasaOS-MessageBus
-	url = https://github.com/worph/CasaOS-MessageBus.git
-	branch = main
+    path = CasaOS-MessageBus
+    url = https://github.com/IceWhaleTech/CasaOS-MessageBus.git
+	branch = v0.4.5
+    update = checkout
+
 [submodule "CasaOS-UI"]
-	path = CasaOS-UI
-	url = https://github.com/worph/CasaOS-UI.git
-	branch = next
+    path = CasaOS-UI
+    url = https://github.com/worph/CasaOS-UI.git
+    branch = casa-img
+    update = merge
+
 [submodule "CasaOS-UserService"]
-	path = CasaOS-UserService
-	url = https://github.com/worph/CasaOS-UserService.git
-	branch = main
+    path = CasaOS-UserService
+    url = https://github.com/worph/CasaOS-UserService.git
+    branch = casa-img
+    update = merge
+
 [submodule "CasaOS-CLI"]
-	path = CasaOS-CLI
-	url = https://github.com/worph/CasaOS-CLI.git
-	branch = main
+    path = CasaOS-CLI
+    url = https://github.com/IceWhaleTech/CasaOS-CLI.git
+	branch = v0.4.4
+    update = checkout
