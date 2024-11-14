@@ -59,6 +59,10 @@ docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:
 
   Replace the example path `/home/example` with the desired storage folder.
 
+ # Acknowledgements 🙏
+ 
+Special thanks to [@worph](https://github.com/worph)
+
 ## Stars 🌟
 [![Stars](https://starchart.cc/dockur/casa.svg?variant=adaptive)](https://starchart.cc/dockur/casa)
 
