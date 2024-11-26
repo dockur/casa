@@ -110,6 +110,8 @@ done
 
 ./register-ui-events.sh
 
+trap - ERR
+
 # Tail the log files to keep the container running and to display the logs in stdout
 tail -f \
 /var/log/casaos-gateway.log \
