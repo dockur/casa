@@ -179,7 +179,7 @@ COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /e
 ############################################################################################################
 # Build the Go binary for the UI
 ############################################################################################################
-FROM --platform=$BUILDPLATFORM node:16 AS builder-casaos-ui
+FROM --platform=$BUILDPLATFORM node:22 AS builder-casaos-ui
 
 ENV NODE_ENV=production
 

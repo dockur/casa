@@ -176,7 +176,7 @@ COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /e
 ############################################################################################################
 # Build the Go binary for the UI
 ############################################################################################################
-FROM node:16 AS builder-casaos-ui
+FROM node:22 AS builder-casaos-ui
 
 WORKDIR /app
 
