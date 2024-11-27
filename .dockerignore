@@ -8,6 +8,7 @@
 .dockerignore
 Dockerfile
 Dockerfile.archive
+Dockerfile.custom
 compose.yml
 docker-compose.yml
 renovate.json
