@@ -15,6 +15,6 @@ jobs:
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: Dockerfile
+          dockerfile: Dockerfile.custom
           ignore: DL3008,SC3037,DL4006
           failure-threshold: warning
