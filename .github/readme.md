@@ -61,7 +61,7 @@ docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:
 
  # Acknowledgements 🙏
  
-Special thanks to [@worph](https://github.com/worph)
+Special thanks to [@worph](https://github.com/worph), this project would not exist without his invaluable work.
 
 ## Stars 🌟
 [![Stars](https://starchart.cc/dockur/casa.svg?variant=adaptive)](https://starchart.cc/dockur/casa)
