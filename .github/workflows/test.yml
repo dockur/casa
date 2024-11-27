@@ -5,7 +5,7 @@ on:
       - '**/*.sh'
       - '.github/workflows/test.yml'
       - '.github/workflows/check.yml'
-      - 'Dockerfile'
+      - 'Dockerfile.custom'
 
 name: "Test"
 permissions: {}
