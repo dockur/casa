@@ -19,6 +19,7 @@ fi
 
 net="casa-net"
 export REF_NET="$net"
+export REF_SEPARATOR="-"
 
 if ! docker network inspect "$net" &>/dev/null; then
   if ! docker network create --driver=bridge --subnet="10.22.0.0/16" "$net" >/dev/null; then
