@@ -133,9 +133,13 @@ done
 
 ./register-ui-events.sh
 
-if ! smbd; then
-  error "Samba daemon failed to start!"
-  smbd -i --debug-stdout || true
+: "${SAMBA:="Y"}"
+
+if [[ "$SAMBA" != [Nn]* ]]; then
+  if ! smbd; then
+    error "Samba daemon failed to start!"
+    smbd -i --debug-stdout || true
+  fi
 fi
 
 trap - ERR
