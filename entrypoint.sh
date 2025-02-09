@@ -18,6 +18,8 @@ if [ ! -S /var/run/docker.sock ]; then
 fi
 
 net="casa-net"
+docker network rm "$net" &>/dev/null || true
+
 export REF_NET="$net"
 export REF_SEPARATOR="-"
 
