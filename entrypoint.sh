@@ -133,6 +133,11 @@ done
 
 ./register-ui-events.sh
 
+if ! smbd; then
+  error "Samba daemon failed to start!"
+  smbd -i --debug-stdout || true
+fi
+
 trap - ERR
 
 # Tail the log files to keep the container running and to display the logs in stdout
