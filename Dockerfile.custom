@@ -179,23 +179,23 @@ COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /e
 ############################################################################################################
 # Build the Go binary for the UI
 ############################################################################################################
-FROM --platform=$BUILDPLATFORM node:16 AS builder-casaos-ui
+FROM --platform=$BUILDPLATFORM node:lts-slim AS builder-casaos-ui
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 ENV NODE_ENV=production
 
 WORKDIR /app
+RUN corepack enable
 
 COPY ./CasaOS-UI/package.json .
-COPY ./CasaOS-UI/yarn.lock .
-COPY ./CasaOS-UI/.yarnrc.yml .
-COPY ./CasaOS-UI/.yarn ./.yarn
-COPY ./CasaOS-UI/main/package.json ./main/package.json
+COPY ./CasaOS-UI/pnpm-lock.yaml .
 
-RUN yarn install --network-timeout 1000000
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY ./CasaOS-UI .
 
-RUN yarn build
+RUN pnpm run build
 
 ############################################################################################################
 # Build the Go binary for the CasaOS Main
@@ -332,7 +332,7 @@ COPY ./conf/local-storage/local-storage.conf /etc/casaos/local-storage.conf
 
 #COPY ui /var/lib/casaos/www and other initial files
 COPY --from=builder-casaos-ui /app/build/sysroot/var/lib/casaos/ /var/lib/casaos/
-COPY --chmod=755 ./CasaOS-UI/main/register-ui-events.sh ./register-ui-events.sh
+COPY --chmod=755 ./CasaOS-UI/register-ui-events.sh ./register-ui-events.sh
 
 # Copy CasaOS-AppStore
 #COPY ./appstore-data/main/build/sysroot/var/lib/casaos/appstore/default.new /var/lib/casaos/appstore/default
