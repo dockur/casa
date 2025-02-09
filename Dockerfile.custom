@@ -177,13 +177,12 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix c
 COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /etc/casaos/local-storage.conf
 
 ############################################################################################################
-# Build the Go binary for the UI
+# Build the Node project for the UI
 ############################################################################################################
 FROM --platform=$BUILDPLATFORM node:lts-slim AS builder-casaos-ui
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-ENV NODE_ENV=production
 
 WORKDIR /app
 #same version as the one in CasaOS-UI package.json
