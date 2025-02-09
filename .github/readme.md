@@ -31,6 +31,7 @@ services:
     volumes:
       - "/home/example:/DATA"
       - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: always
     stop_grace_period: 1m
 ```
 
