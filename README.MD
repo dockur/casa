@@ -2,6 +2,15 @@
 
 This project aims to deliver CasaOS (https://github.com/IceWhaleTech/CasaOS) as a docker container.
 
+## Sponsor
+Thanks for sponsoring this project
+
+**Yundera** : [yundera.com](https://yundera.com) - Easy to use cloud server for open source container applications.
+
+## Sibling project
+[Mesh-Router](https://github.com/worph/mesh-router) - providing easy management of for domain accessible containers and compatible with CasaIMG.
+
+
 ## Prerequisites
 - Docker must be installed on the host (works on Windows and Linux host)
 - At least 150MB of RAM
@@ -166,21 +175,20 @@ npx dockflow build
 ```
 
 ## Submodule Versions
-## Submodule Versions
 
 This project integrates various CasaOS components as submodules. Each submodule is tracked at a specific version to ensure stability and compatibility.
 
-| Component | Branch | Version | Upstream Repository |
-|-----------|---------|--------|-------------------|
-| CasaOS | main | v0.4.13 | [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS) |
-| CasaOS-AppManagement | casa-img | | [IceWhaleTech/CasaOS-AppManagement](https://github.com/IceWhaleTech/CasaOS-AppManagement) |
-| CasaOS-AppStore | main | no version | [IceWhaleTech/CasaOS-AppStore](https://github.com/IceWhaleTech/CasaOS-AppStore) |
-| CasaOS-Gateway | main | v0.4.8 | [IceWhaleTech/CasaOS-Gateway](https://github.com/IceWhaleTech/CasaOS-Gateway) |
-| CasaOS-LocalStorage | main | v0.4.5-2 | [IceWhaleTech/CasaOS-LocalStorage](https://github.com/IceWhaleTech/CasaOS-LocalStorage) |
-| CasaOS-MessageBus | main | v0.4.5 | [IceWhaleTech/CasaOS-MessageBus](https://github.com/IceWhaleTech/CasaOS-MessageBus) |
-| CasaOS-UI | casa-img | | [IceWhaleTech/CasaOS-UI](https://github.com/IceWhaleTech/CasaOS-UI) |
-| CasaOS-UserService | casa-img | | [IceWhaleTech/CasaOS-UserService](https://github.com/IceWhaleTech/CasaOS-UserService) |
-| CasaOS-CLI | main | v0.4.4 | [IceWhaleTech/CasaOS-CLI](https://github.com/IceWhaleTech/CasaOS-CLI) |
+| Component | Branch            | Version        | Upstream Repository |
+|-----------|-------------------|----------------|-------------------|
+| CasaOS | main              | v0.4.15        | [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS) |
+| CasaOS-AppManagement | casa-img          | v0.4.16-alpha2 | [IceWhaleTech/CasaOS-AppManagement](https://github.com/IceWhaleTech/CasaOS-AppManagement) |
+| CasaOS-AppStore | main              | no version     | [IceWhaleTech/CasaOS-AppStore](https://github.com/IceWhaleTech/CasaOS-AppStore) |
+| CasaOS-Gateway | main              | v0.4.8         | [IceWhaleTech/CasaOS-Gateway](https://github.com/IceWhaleTech/CasaOS-Gateway) |
+| CasaOS-LocalStorage | main              | v0.4.5-2       | [IceWhaleTech/CasaOS-LocalStorage](https://github.com/IceWhaleTech/CasaOS-LocalStorage) |
+| CasaOS-MessageBus | main              | v0.4.5         | [IceWhaleTech/CasaOS-MessageBus](https://github.com/IceWhaleTech/CasaOS-MessageBus) |
+| CasaOS-UI | casa-img | 0.4.20         | [IceWhaleTech/CasaOS-UI](https://github.com/IceWhaleTech/CasaOS-UI) |
+| CasaOS-UserService | casa-img          | v0.4.8         | [IceWhaleTech/CasaOS-UserService](https://github.com/IceWhaleTech/CasaOS-UserService) |
+| CasaOS-CLI | main              | v0.4.4         | [IceWhaleTech/CasaOS-CLI](https://github.com/IceWhaleTech/CasaOS-CLI) |
 ## Support
 
 Need help? Join our Discord community: [https://discord.gg/QJyuNDXuFa](https://discord.gg/QJyuNDXuFa)
