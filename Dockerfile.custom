@@ -278,7 +278,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix c
 # Build the final image
 ############################################################################################################
 
-FROM debian:bookworm-slim AS casaos
+FROM debian:trixie-slim AS casaos
 
 ARG TARGETARCH
 ARG VERSION_ARG="0.0"
