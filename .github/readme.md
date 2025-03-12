@@ -29,7 +29,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - "/home/example:/DATA"
+      - "./casa:/DATA"
       - "/var/run/docker.sock:/var/run/docker.sock"
     restart: always
     stop_grace_period: 1m
@@ -38,7 +38,7 @@ services:
 Via Docker CLI:
 
 ```bash
-docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:/var/run/docker.sock --stop-timeout 60 dockurr/casa
+docker run -it --rm --name casa -p 8080:8080 -v ${PWD:-.}/casa:/DATA -v /var/run/docker.sock:/var/run/docker.sock --stop-timeout 60 dockurr/casa
 ```
 
 ## Screenshot 📸
@@ -55,10 +55,10 @@ docker run -it --rm -p 8080:8080 -v /home/example:/DATA -v /var/run/docker.sock:
 
   ```yaml
   volumes:
-    - /home/example:/DATA
+    - ./casa:/DATA
   ```
 
-  Replace the example path `/home/example` with the desired storage folder.
+  Replace the example path `./casa` with the desired storage folder or named volume.
 
  # Acknowledgements 🙏
  
