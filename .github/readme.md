@@ -29,8 +29,8 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - "./casa:/DATA"
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./casa:/DATA
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: always
     stop_grace_period: 1m
 ```
