@@ -19,7 +19,7 @@ Docker container of [CasaOS](https://casaos.io/) (an OS for self-hosting).
 
 ## Usage  🐳
 
-Via Docker Compose:
+##### Via Docker Compose:
 
 ```yaml
 services:
@@ -35,7 +35,7 @@ services:
     stop_grace_period: 1m
 ```
 
-Via Docker CLI:
+##### Via Docker CLI:
 
 ```bash
 docker run -it --rm --name casa -p 8080:8080 -v ${PWD:-.}/casa:/DATA -v /var/run/docker.sock:/var/run/docker.sock --stop-timeout 60 dockurr/casa
