@@ -41,6 +41,10 @@ services:
 docker run -it --rm --name casa -p 8080:8080 -v ${PWD:-.}/casa:/DATA -v /var/run/docker.sock:/var/run/docker.sock --stop-timeout 60 dockurr/casa
 ```
 
+##### Via Github Codespaces:
+
+[`Click here to launch this container in the cloud!`](https://github.com/codespaces/new?skip_quickstart=true&machine=basicLinux32gb&repo=886030385&ref=master&devcontainer_path=.devcontainer.json)
+
 ## Screenshot 📸
 
 <div align="center">
