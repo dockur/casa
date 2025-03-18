@@ -1,0 +1,6 @@
+{
+  "name": "casa",
+  "service": "casa",
+  "forwardPorts": [8080],
+  "dockerComposeFile": "compose.yml"
+}
