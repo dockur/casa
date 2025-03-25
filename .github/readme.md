@@ -43,7 +43,7 @@ docker run -it --rm --name casa -p 8080:8080 -v ${PWD:-.}/casa:/DATA -v /var/run
 
 ##### Via Github Codespaces:
 
-[`Click here to launch this container in the cloud!`](https://github.com/codespaces/new?skip_quickstart=true&machine=basicLinux32gb&repo=886030385&ref=master&devcontainer_path=.devcontainer.json)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?repo=886030385&machine=basicLinux32gb)
 
 ## Screenshot 📸
 
