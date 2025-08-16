@@ -1,7 +1,7 @@
 ############################################################################################################
 # Build the Go binary for the Gateway
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-gateway
+FROM golang:1.25-alpine AS builder-casaos-gateway
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ RUN mkdir -p /var/run/casaos/ && echo -n "{}" >> /var/run/casaos/routes.json
 ############################################################################################################
 # Build the Go binary for the User Service
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-user-service
+FROM golang:1.25-alpine AS builder-casaos-user-service
 
 WORKDIR /app
 
@@ -64,7 +64,7 @@ COPY ./CasaOS-UserService/build/sysroot/etc/casaos/user-service.conf.sample /etc
 ############################################################################################################
 # Build the Go binary for the MessageBus
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-message-bus
+FROM golang:1.25-alpine AS builder-casaos-message-bus
 
 WORKDIR /app
 
@@ -98,7 +98,7 @@ COPY ./CasaOS-MessageBus/build/sysroot/etc/casaos/message-bus.conf.sample /etc/c
 ############################################################################################################
 # Build the Go binary for the AppManagement
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-app-management
+FROM golang:1.25-alpine AS builder-casaos-app-management
 
 WORKDIR /app
 
@@ -136,7 +136,7 @@ COPY ./CasaOS-AppManagement/build/sysroot/etc/casaos/env /etc/casaos/env
 ############################################################################################################
 # Build the Go binary for the LocalStorage
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-local-storage
+FROM golang:1.25-alpine AS builder-casaos-local-storage
 
 WORKDIR /app
 
@@ -196,7 +196,7 @@ RUN pnpm run build
 ############################################################################################################
 # Build the Go binary for the CasaOS Main
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-main
+FROM golang:1.25-alpine AS builder-casaos-main
 
 WORKDIR /app
 
@@ -236,7 +236,7 @@ COPY ./CasaOS/build/sysroot/etc/casaos/casaos.conf.sample /etc/casaos/casaos.con
 ############################################################################################################
 # Build the Go binary for the CasaOS Cli
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-cli
+FROM golang:1.25-alpine AS builder-casaos-cli
 
 WORKDIR /app
 
