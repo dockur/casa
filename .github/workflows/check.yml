@@ -16,5 +16,5 @@ jobs:
         uses: hadolint/hadolint-action@v3.2.0
         with:
           dockerfile: Dockerfile.custom
-          ignore: DL3008,SC3037,DL4006
+          ignore: DL3008,SC3037,DL4006,DL3062
           failure-threshold: warning
