@@ -1,0 +1,15 @@
+{
+  "name": "CasaOS",
+  "service": "casa",
+  "forwardPorts": [8080],  
+  "portsAttributes": {
+    "8080": {
+      "label": "Web",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "silent"
+  }, 
+  "dockerComposeFile": "codespaces.yml"
+}
