@@ -1,7 +1,7 @@
 services:
   casa:
-    image: dockurr/casa
     container_name: casa
+    image: ghcr.io/dockur/casa
     ports:
       - 8080:8080
     volumes:
