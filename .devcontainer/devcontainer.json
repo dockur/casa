@@ -1,11 +1,10 @@
 {
   "name": "CasaOS",
   "service": "casa",
-  "forwardPorts": [8080],  
   "portsAttributes": {
     "8080": {
       "label": "Web",
-      "onAutoForward": "openBrowser"
+      "onAutoForward": "notify"
     }
   },
   "otherPortsAttributes": {
