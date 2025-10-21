@@ -38,7 +38,7 @@ services:
 ##### Via Docker CLI:
 
 ```bash
-docker run -it --rm --name casa -p 8080:8080 -v "${PWD:-.}/casa:/DATA" -v "/var/run/docker.sock:/var/run/docker.sock" --stop-timeout 60 dockurr/casa
+docker run -it --rm --name casa -p 8080:8080 -v "${PWD:-.}/casa:/DATA" -v "/var/run/docker.sock:/var/run/docker.sock" --stop-timeout 60 docker.io/dockurr/casa
 ```
 
 ##### Via Github Codespaces:
