@@ -11,7 +11,5 @@
   "otherPortsAttributes": {
     "onAutoForward": "ignore"
   }, 
-  "dockerComposeFile": "codespaces.yml",
-  "workspaceFolder": "/workspaces/casa",
-  "initializeCommand": "docker system prune --all --force"
+  "dockerComposeFile": "codespaces.yml"
 }
