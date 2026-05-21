@@ -4,6 +4,7 @@
 .github
 .gitignore
 .gitmodules
+*.ps1
 .vscode
 .dockerignore
 Dockerfile
