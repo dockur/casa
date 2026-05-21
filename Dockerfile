@@ -274,7 +274,7 @@ RUN go build -o casaos-cli .
 FROM ubuntu:24.04
 
 # Install required packages
-RUN apt-get update && apt-get install -y wget curl smartmontools parted ntfs-3g net-tools udevil samba cifs-utils mergerfs unzip openssh-server
+RUN apt-get update && apt-get install -y wget gosu curl smartmontools parted ntfs-3g net-tools udevil samba cifs-utils mergerfs unzip openssh-server
 
 # install docker https://docs.docker.com/engine/install/ubuntu/
 RUN curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
@@ -287,62 +287,38 @@ ENV REF_SEPARATOR=-
 #ENV REF_PORT=443
 
 
-# Set the Current Working Directory inside the container
-WORKDIR /root/
+# Set the working directory for binaries
+WORKDIR /usr/local/bin
 
-# Copy the Pre-built binary file and configuration files from the gateway
+# Copy all service binaries
 COPY --from=builder-casaos-gateway /app/casaos-gateway .
-#COPY --from=builder-casaos-gateway /etc/casaos/gateway.ini /etc/casaos/gateway.ini
-COPY ./conf/gateway/gateway.ini /etc/casaos/gateway.ini
-COPY --from=builder-casaos-gateway /var/run/casaos/routes.json /var/run/casaos/routes.json
-
-
-# Copy the Pre-built binary file and configuration files from the app-management
 COPY --from=builder-casaos-app-management /app/casaos-app-management .
-#COPY --from=builder-casaos-app-management /etc/casaos/app-management.conf /etc/casaos/app-management.conf
-COPY ./conf/app-management/app-management.conf /etc/casaos/app-management.conf
-COPY --from=builder-casaos-app-management /etc/casaos/env /etc/casaos/env
-
-# Copy the Pre-built binary file from the user-service
 COPY --from=builder-casaos-user-service /app/casaos-user-service .
-#COPY --from=builder-casaos-user-service /etc/casaos/user-service.conf /etc/casaos/user-service.conf
-COPY ./conf/user-service/user-service.conf /etc/casaos/user-service.conf
-
-# Copy the Pre-built binary file and configuration files from the message-bus
 COPY --from=builder-casaos-message-bus /app/casaos-message-bus .
-#COPY --from=builder-casaos-message-bus /etc/casaos/message-bus.conf /etc/casaos/message-bus.conf
-COPY ./conf/message-bus/message-bus.conf /etc/casaos/message-bus.conf
-
-# Copy the Pre-built binary file and configuration files from the local-storage
 COPY --from=builder-casaos-local-storage /app/casaos-local-storage .
-#COPY --from=builder-casaos-local-storage /etc/casaos/local-storage.conf /etc/casaos/local-storage.conf
-COPY ./conf/local-storage/local-storage.conf /etc/casaos/local-storage.conf
-
-#COPY ui /var/lib/casaos/www and other initial files
-COPY --from=builder-casaos-ui /app/build/sysroot/var/lib/casaos/ /var/lib/casaos/
-COPY ./CasaOS-UI/register-ui-events.sh ./register-ui-events.sh
-RUN chmod +x ./register-ui-events.sh
-
-# Copy CasaOS-AppStore
-#COPY ./appstore-data/main/build/sysroot/var/lib/casaos/appstore/default.new /var/lib/casaos/appstore/default
-COPY ./CasaOS-AppStore/Apps /var/lib/casaos/appstore/default/Apps
-COPY ./CasaOS-AppStore/*.json /var/lib/casaos/appstore/default/
-
-# Copy the Pre-built binary file and configuration files from the main
 COPY --from=builder-casaos-main /app/casaos-main .
-#COPY --from=builder-casaos-main /etc/casaos/casaos.conf /etc/casaos/casaos.conf
-COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
-
-# Copy the Pre-built binary file from the cli
 COPY --from=builder-casaos-cli /app/casaos-cli .
 
-COPY ./entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
+# Copy config files
+COPY ./conf/gateway/gateway.ini /etc/casaos/gateway.ini
+COPY ./conf/app-management/app-management.conf /etc/casaos/app-management.conf
+COPY --from=builder-casaos-app-management /etc/casaos/env /etc/casaos/env
+COPY ./conf/user-service/user-service.conf /etc/casaos/user-service.conf
+COPY ./conf/message-bus/message-bus.conf /etc/casaos/message-bus.conf
+COPY ./conf/local-storage/local-storage.conf /etc/casaos/local-storage.conf
+COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
 
-# Expose port 8080 to the outside world
+# Copy UI files
+COPY --from=builder-casaos-ui /app/build/sysroot/var/lib/casaos/ /var/lib/casaos/
+COPY ./CasaOS-UI/register-ui-events.sh /usr/local/bin/register-ui-events.sh
+RUN chmod +x /usr/local/bin/register-ui-events.sh
+
+# Copy entrypoint
+COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Expose port
 EXPOSE 8080
 
-# Command to run the executable
-ENTRYPOINT ["/root/entrypoint.sh"]
-
-#Note persistent volume to be mounted on /root/DATA
+# Define entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
