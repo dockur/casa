@@ -271,7 +271,7 @@ RUN go build -o casaos-cli .
 ############################################################################################################
 # Build the final image
 ############################################################################################################
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 # Install required packages
 RUN apt-get update && apt-get install -y wget gosu curl smartmontools parted ntfs-3g net-tools udevil samba cifs-utils mergerfs unzip openssh-server
