@@ -306,7 +306,7 @@ RUN set -eu \
 ENV GO_ENV=production
 
 # Docker API version compatibility - ensures SDK works with newer Docker daemons
-ENV DOCKER_API_VERSION=1.4
+ENV DOCKER_API_VERSION=1.44
 ENV PATH="/command:$PATH"
 
 # Set the Current Working Directory inside the container
