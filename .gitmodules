@@ -10,22 +10,10 @@
     branch = casa-img
     update = merge
 
-[submodule "CasaOS-AppStore"]
-    path = CasaOS-AppStore
-    url = https://github.com/IceWhaleTech/CasaOS-AppStore.git
-    branch = main
-    update = checkout
-
 [submodule "CasaOS-Gateway"]
     path = CasaOS-Gateway
     url = https://github.com/IceWhaleTech/CasaOS-Gateway.git
 	branch = v0.4.8
-    update = checkout
-
-[submodule "CasaOS-LocalStorage"]
-    path = CasaOS-LocalStorage
-    url = https://github.com/IceWhaleTech/CasaOS-LocalStorage.git
-	branch = v0.4.5-2
     update = checkout
 
 [submodule "CasaOS-MessageBus"]
@@ -51,3 +39,6 @@
     url = https://github.com/IceWhaleTech/CasaOS-CLI.git
 	branch = v0.4.4
     update = checkout
+[submodule "CasaOS-LocalStorage"]
+	path = CasaOS-LocalStorage
+	url = https://github.com/worph/CasaOS-LocalStorage.git

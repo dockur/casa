@@ -1,3 +1,5 @@
+[![Build and Push Docker Image](https://github.com/worph/casa-img/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/worph/casa-img/actions/workflows/docker-publish.yml)
+
 # CasaIMG Project
 
 This project aims to deliver CasaOS (https://github.com/IceWhaleTech/CasaOS) as a docker container.
