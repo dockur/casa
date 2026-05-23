@@ -324,7 +324,7 @@ COPY --from=builder-casaos-gateway /var/run/casaos/routes.json /var/run/casaos/r
 
 # Copy UI files
 COPY --from=builder-casaos-ui /app/build/sysroot/var/lib/casaos/ /var/lib/casaos/
-COPY --chmod=755 ./CasaOS-UI/register-ui-events.sh ./register-ui-events.sh
+COPY --chmod=755 ./CasaOS-UI/register-ui-events.sh /usr/local/bin/register-ui-events.sh
 
 RUN chmod +x /usr/share/casaos/shell/*.sh
 
