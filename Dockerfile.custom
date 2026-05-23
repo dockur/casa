@@ -310,7 +310,7 @@ ENV DOCKER_API_VERSION=1.44
 ENV PATH="/command:$PATH"
 
 # Set the Current Working Directory inside the container
-WORKDIR /root/
+WORKDIR /usr/local/bin
 
 # Copy all service binaries
 COPY --from=builder-casaos-gateway /app/casaos-gateway .
@@ -346,4 +346,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -ILfSs http://localhost:8080 >/dev/null || exit 1
 
 # Command to run the executable
-ENTRYPOINT ["/usr/bin/tini", "-s", "/root/entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tini", "-s", "/usr/local/bin/entrypoint.sh"]
