@@ -179,9 +179,6 @@ filter_logs() {
     done
 }
 
-#echo "Starting CasaOS services as UID:GID $PUID:$PGID..."
-#echo "Docker group ID: $DOCKER_GID"
-
 # Start the Gateway service with filtering
 gosu "$PUID:$PGID" /usr/local/bin/casaos-gateway 2>&1 | filter_logs "gateway" > /var/log/casaos-gateway.log &
 
@@ -233,6 +230,13 @@ gosu "$PUID:$PGID" /usr/local/bin/casaos-user-service 2>&1 | filter_logs "user-s
 # Run the register UI events script
 chown -R "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
 gosu "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
+
+# Configure rclone
+mkdir -p /var/run/rclone
+touch /var/run/rclone/rclone.sock
+
+# Ensure rclone socket has correct permissions
+chown "$PUID:$PGID" /var/run/rclone/rclone.sock
 
 : "${SAMBA:="Y"}"
 
