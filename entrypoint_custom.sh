@@ -80,7 +80,7 @@ mkdir -p /var/log
 touch /var/log/casaos-gateway.log
 touch /var/log/casaos-app-management.log
 touch /var/log/casaos-user-service.log
-touch /var/log/casaos-mesage-bus.log
+touch /var/log/casaos-message-bus.log
 touch /var/log/casaos-local-storage.log
 touch /var/log/casaos-main.log
 
