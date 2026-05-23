@@ -182,19 +182,24 @@ COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /e
 ############################################################################################################
 FROM --platform=$BUILDPLATFORM node:lts-slim AS builder-casaos-ui
 
+ARG VERSION_ARG="0.0"
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 WORKDIR /app
 #same version as the one in CasaOS-UI package.json
-RUN corepack enable && corepack prepare pnpm@9.0.6 --activate
+RUN npm install -g corepack@latest && corepack enable
 
 COPY ./CasaOS-UI/package.json .
 COPY ./CasaOS-UI/pnpm-lock.yaml .
+COPY ./CasaOS-UI/pnpm-workspace.yaml .
+
+RUN corepack install
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY ./CasaOS-UI .
+ENV VUE_APP_VERSION=$VERSION_ARG
 RUN pnpm run build
 
 ############################################################################################################
@@ -288,7 +293,7 @@ ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 
 RUN set -eu \
   && apt-get update -y \
-  && apt-get --no-install-recommends -y install jq tini gnupg wget gosu curl smartmontools e2fsprogs parted ntfs-3g net-tools iputils-ping udevil samba cifs-utils mergerfs unzip openssh-server ca-certificates \
+  && apt-get --no-install-recommends -y install jq tini gnupg rclone wget gosu curl smartmontools e2fsprogs parted ntfs-3g net-tools iputils-ping udevil samba cifs-utils mergerfs zip unzip openssh-server ca-certificates \
   && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
   && apt-get update -y \
@@ -299,8 +304,10 @@ RUN set -eu \
 
 # Set environment variables
 ENV GO_ENV=production
+
 # Docker API version compatibility - ensures SDK works with newer Docker daemons
 ENV DOCKER_API_VERSION=1.4
+ENV PATH="/command:$PATH"
 
 # Set the Current Working Directory inside the container
 WORKDIR /root/
@@ -323,7 +330,6 @@ COPY ./conf/user-service/user-service.conf /etc/casaos/user-service.conf
 COPY ./conf/message-bus/message-bus.conf /etc/casaos/message-bus.conf
 COPY ./conf/local-storage/local-storage.conf /etc/casaos/local-storage.conf
 COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
-COPY --from=builder-casaos-gateway /var/run/casaos/routes.json /var/run/casaos/routes.json
 
 # Copy UI files
 COPY --from=builder-casaos-ui /app/build/sysroot/var/lib/casaos/ /var/lib/casaos/
@@ -335,6 +341,9 @@ COPY --chmod=755 ./entrypoint_custom.sh ./entrypoint.sh
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -ILfSs http://localhost:8080 >/dev/null || exit 1
 
 # Command to run the executable
 ENTRYPOINT ["/usr/bin/tini", "-s", "/root/entrypoint.sh"]
