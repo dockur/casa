@@ -350,7 +350,7 @@ COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
 
 # Copy the Pre-built binary file from the cli
 COPY --from=builder-casaos-cli /app/casaos-cli .
-COPY --chmod=755 ./entrypoint.sh ./entrypoint.sh
+COPY --chmod=755 ./entrypoint_custom.sh ./entrypoint.sh
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
