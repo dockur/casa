@@ -192,7 +192,7 @@ RUN npm install -g corepack@latest && corepack enable
 
 COPY ./CasaOS-UI/package.json .
 COPY ./CasaOS-UI/pnpm-lock.yaml .
-COPY ./CasaOS-UI/pnpm-workspace.yaml .
+#COPY ./CasaOS-UI/pnpm-workspace.yaml .
 
 RUN corepack install
 
