@@ -10,10 +10,6 @@ trap 'error "Status $? while: $BASH_COMMAND (line $LINENO/$BASH_LINENO)"' ERR
 [ ! -f "/usr/local/bin/entrypoint.sh" ] && error "Script must run inside Docker container!" && exit 11
 [ "$(id -u)" -ne "0" ] && error "Script must be executed with root privileges." && exit 12
 
-# Get UID/GID from environment variables (default to 1000 if not set)
-PUID=${PUID:-1000}
-PGID=${PGID:-1000}
-
 echo "❯ Starting CasaOS for Docker v$(</run/version)..."
 echo "❯ For support visit https://github.com/dockur/casa/issues"
 
@@ -76,6 +72,10 @@ if [[ "$mount" != "/DATA" ]]; then
 fi
 
 export DATA_ROOT="$mount"
+
+# Get UID/GID from environment variables (default to 1000 if not set)
+PUID=${PUID:-1000}
+PGID=${PGID:-1000}
 
 # Get Docker group ID from the docker socket file
 DOCKER_GID=$(stat -c '%g' /var/run/docker.sock 2>/dev/null || echo "999")
@@ -217,8 +217,8 @@ gosu "$PUID:$PGID" /usr/local/bin/casaos-local-storage 2>&1 | filter_logs "local
 
 # Wait for /var/run/casaos/routes.json to be created and contains local_storage
 while [ ! -f /var/run/casaos/routes.json ] || ! grep -q "local_storage" /var/run/casaos/routes.json; do
-    info "Waiting for /var/run/casaos/routes.json to be created and contains local_storage..."
-    sleep 1
+  info "Waiting for routes to be created..."
+  sleep 1
 done
 
 # Start the AppManagement service with dynamic Docker group ID and filtering
