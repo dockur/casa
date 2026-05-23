@@ -159,7 +159,6 @@ RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -generate types,client -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
 
-
 COPY ./CasaOS-LocalStorage/build ./build
 COPY ./CasaOS-LocalStorage/cmd ./cmd
 COPY ./CasaOS-LocalStorage/common ./common
@@ -179,7 +178,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix c
 COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /etc/casaos/local-storage.conf
 
 ############################################################################################################
-# Build the Node project for the UI
+# Build the Go binary for the UI
 ############################################################################################################
 FROM --platform=$BUILDPLATFORM node:lts-slim AS builder-casaos-ui
 
@@ -196,7 +195,6 @@ COPY ./CasaOS-UI/pnpm-lock.yaml .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY ./CasaOS-UI .
-
 RUN pnpm run build
 
 ############################################################################################################
@@ -279,7 +277,6 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix c
 ############################################################################################################
 # Build the final image
 ############################################################################################################
-
 FROM debian:trixie-slim AS casaos
 
 ARG TARGETARCH
@@ -290,7 +287,7 @@ ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 
 RUN set -eu \
   && apt-get update -y \
-  && apt-get --no-install-recommends -y install jq tini gnupg wget curl smartmontools e2fsprogs parted ntfs-3g net-tools iputils-ping udevil samba cifs-utils mergerfs unzip openssh-server ca-certificates \
+  && apt-get --no-install-recommends -y install jq tini gnupg wget gosu curl smartmontools e2fsprogs parted ntfs-3g net-tools iputils-ping udevil samba cifs-utils mergerfs unzip openssh-server ca-certificates \
   && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
   && apt-get update -y \
@@ -305,51 +302,32 @@ ENV GO_ENV=production
 # Set the Current Working Directory inside the container
 WORKDIR /root/
 
-# Copy the Pre-built binary file and configuration files from the gateway
+# Copy all service binaries
 COPY --from=builder-casaos-gateway /app/casaos-gateway .
-#COPY --from=builder-casaos-gateway /etc/casaos/gateway.ini /etc/casaos/gateway.ini
-COPY ./conf/gateway/gateway.ini /etc/casaos/gateway.ini
-COPY --from=builder-casaos-gateway /var/run/casaos/routes.json /var/run/casaos/routes.json
-
-# Copy the Pre-built binary file and configuration files from the app-management
 COPY --from=builder-casaos-app-management /app/casaos-app-management .
-#COPY --from=builder-casaos-app-management /etc/casaos/app-management.conf /etc/casaos/app-management.conf
+COPY --from=builder-casaos-user-service /app/casaos-user-service .
+COPY --from=builder-casaos-message-bus /app/casaos-message-bus .
+COPY --from=builder-casaos-local-storage /app/casaos-local-storage .
+COPY --from=builder-casaos-main /app/casaos-main .
+COPY --from=builder-casaos-cli /app/casaos-cli .
+COPY --from=builder-casaos-main /app/build/sysroot/usr/share/casaos/shell/ /usr/share/casaos/shell
+
+# Copy config files
+COPY ./conf/gateway/gateway.ini /etc/casaos/gateway.ini
 COPY ./conf/app-management/app-management.conf /etc/casaos/app-management.conf
 COPY --from=builder-casaos-app-management /etc/casaos/env /etc/casaos/env
-
-# Copy the Pre-built binary file from the user-service
-COPY --from=builder-casaos-user-service /app/casaos-user-service .
-#COPY --from=builder-casaos-user-service /etc/casaos/user-service.conf /etc/casaos/user-service.conf
 COPY ./conf/user-service/user-service.conf /etc/casaos/user-service.conf
-
-# Copy the Pre-built binary file and configuration files from the message-bus
-COPY --from=builder-casaos-message-bus /app/casaos-message-bus .
-#COPY --from=builder-casaos-message-bus /etc/casaos/message-bus.conf /etc/casaos/message-bus.conf
 COPY ./conf/message-bus/message-bus.conf /etc/casaos/message-bus.conf
-
-# Copy the Pre-built binary file and configuration files from the local-storage
-COPY --from=builder-casaos-local-storage /app/casaos-local-storage .
-#COPY --from=builder-casaos-local-storage /etc/casaos/local-storage.conf /etc/casaos/local-storage.conf
 COPY ./conf/local-storage/local-storage.conf /etc/casaos/local-storage.conf
+COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
+COPY --from=builder-casaos-gateway /var/run/casaos/routes.json /var/run/casaos/routes.json
 
-#COPY ui /var/lib/casaos/www and other initial files
+# Copy UI files
 COPY --from=builder-casaos-ui /app/build/sysroot/var/lib/casaos/ /var/lib/casaos/
 COPY --chmod=755 ./CasaOS-UI/register-ui-events.sh ./register-ui-events.sh
 
-# Copy CasaOS-AppStore
-#COPY ./appstore-data/main/build/sysroot/var/lib/casaos/appstore/default.new /var/lib/casaos/appstore/default
-COPY ./CasaOS-AppStore/Apps /var/lib/casaos/appstore/default/Apps
-COPY ./CasaOS-AppStore/*.json /var/lib/casaos/appstore/default/
-
-# Copy the Pre-built binary file and configuration files from the main
-COPY --from=builder-casaos-main /app/casaos-main .
-COPY --from=builder-casaos-main /app/build/sysroot/usr/share/casaos/shell/ /usr/share/casaos/shell
 RUN chmod +x /usr/share/casaos/shell/*.sh
 
-COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
-
-# Copy the Pre-built binary file from the cli
-COPY --from=builder-casaos-cli /app/casaos-cli .
 COPY --chmod=755 ./entrypoint_custom.sh ./entrypoint.sh
 
 # Expose port 8080 to the outside world
