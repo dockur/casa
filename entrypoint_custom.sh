@@ -185,12 +185,13 @@ filter_logs() {
 # Start the Gateway service with filtering
 gosu "$PUID:$PGID" /usr/local/bin/casaos-gateway 2>&1 | filter_logs "gateway" > /var/log/casaos-gateway.log &
 
-# Wait for the Gateway service to start
+# Wait for the Management service to start
 while [ ! -f /var/run/casaos/management.url ]; do
-  info "Waiting for the Gateway service to start..."
+  info "Waiting for the Management service to start..."
   sleep 1
 done
 
+# Wait for the Gateway service to start
 while [ ! -f /var/run/casaos/static.url ]; do
   info "Waiting for the Gateway service to start..."
   sleep 1
