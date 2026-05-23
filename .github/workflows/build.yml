@@ -21,16 +21,58 @@ jobs:
       contents: read
     steps:
       - 
+        name: Run graphql query to get tag
+        uses: octokit/graphql-action@v3.x
+        id: latest_tag
+        with:
+          variables: |
+            repo: casa-img
+            owner: worph
+          query: |
+            query tag($owner: String!, $repo: String!) {
+              repository(owner: $owner, name: $repo) {
+                refs(refPrefix: "refs/tags/", last: 1, orderBy: {field: TAG_COMMIT_DATE, direction: ASC}) {
+                  edges {
+                    node {
+                      name
+               } } } } }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - 
+        name: Parse tag from query output
+        run: |
+          #!/bin/bash
+          latest_tag=$(echo '${{ steps.latest_tag.outputs.data }}' | jq '.repository.refs.edges[][].name' -r)
+          [ -z "$latest_tag" ] && echo "Tag not found!" && exit 1
+          [[ "$latest_tag" == "null" ]] && echo "Tag not found!" && exit 1
+          [[ "$latest_tag" = v* ]] && latest_tag="${latest_tag:1}"
+          echo "Found tag: \"${latest_tag}\"" 
+          latest_version="${latest_tag%-*}"
+          major="${latest_version%%.*}"
+          minor="${latest_version#*.}"
+          minor="${minor%%.*}"
+          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+          echo "latest_minor=$major.$minor" >> $GITHUB_ENV
+      - 
         name: Check if the tag exists locally
         uses: action-pack/tag-exists@v1
         id: checkTag
         with: 
-          tag: 'v${{ vars.VERSION }}'         
+          tag: 'v${{ env.latest_tag }}'
       -
         name: Finish when found
         run: |
           #!/bin/bash
+          beta="false"
+          
           val="${{ steps.checkTag.outputs.exists }}"
+
+          [[ "${{ env.latest_tag }}" == *"rc"* ]] && beta="true"
+          [[ "${{ env.latest_tag }}" == *"beta"* ]] && beta="true"
+          [[ "${{ env.latest_tag }}" == *"test"* ]] && val="true"
+          [[ "${{ env.latest_tag }}" == *"alpha"* ]] && val="true"
+
+          echo "beta=${beta}" >> $GITHUB_ENV
           echo "exists=${val}" >> $GITHUB_ENV
       -
         name: Checkout
@@ -41,6 +83,7 @@ jobs:
           submodules: 'true'
       -
         name: Free Disk Space
+        if: env.exists == 'false'
         uses: jlumbroso/free-disk-space@main
         with:
           # this might remove tools that are actually needed,
@@ -65,8 +108,9 @@ jobs:
             ${{ secrets.DOCKERHUB_REPO }}
             ghcr.io/${{ github.repository }}
           tags: |
-            type=raw,value=latest,priority=100
-            type=raw,value=${{ vars.VERSION }}
+            type=raw,value=${{ env.latest_minor }},enable=${{ env.beta == 'false' }}
+            type=raw,value=latest,priority=100,enable=${{ env.beta == 'false' }}
+            type=raw,value=${{ env.latest_tag }},priority=250
           labels: |
             org.opencontainers.image.title=${{ vars.NAME }}
         env:
