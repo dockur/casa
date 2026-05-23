@@ -346,4 +346,3 @@ EXPOSE 8080
 ENTRYPOINT ["/root/entrypoint.sh"]
 
 #Note persistent volume to be mounted on /root/DATA
-
