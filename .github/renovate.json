@@ -1,5 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":disableDependencyDashboard"],
-  "forkProcessing": "enabled"
+  "forkProcessing": "enabled",
+  "dockerfile": {
+    "enabled": false
+  },
+   "docker-compose": {
+    "enabled": false
+  },
+   "ignorePaths": [
+      ".github/workflows/docker-publish.yml"
+  ]
 }
