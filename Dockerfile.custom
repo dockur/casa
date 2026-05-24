@@ -323,7 +323,6 @@ COPY --from=builder-casaos-message-bus /app/casaos-message-bus .
 COPY --from=builder-casaos-local-storage /app/casaos-local-storage .
 COPY --from=builder-casaos-main /app/casaos-main .
 COPY --from=builder-casaos-cli /app/casaos-cli .
-COPY --from=builder-casaos-main /app/build/sysroot/usr/share/casaos/shell/ /usr/share/casaos/shell
 
 # Copy config files
 COPY ./conf/gateway/gateway.ini /etc/casaos/gateway.ini
@@ -338,15 +337,14 @@ COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
 COPY --from=builder-casaos-ui /app/build/sysroot/var/lib/casaos/ /var/lib/casaos/
 COPY --chmod=755 ./CasaOS-UI/register-ui-events.sh /usr/local/bin/register-ui-events.sh
 
-RUN chmod +x /usr/share/casaos/shell/*.sh
-
+# Copy entrypoint
 COPY --chmod=755 ./entrypoint_custom.sh ./entrypoint.sh
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -ILfSs http://localhost:8080 >/dev/null || exit 1
+  CMD curl -LfSs http://localhost:8080 >/dev/null || exit 1
 
 # Command to run the executable
 ENTRYPOINT ["/usr/bin/tini", "-s", "/usr/local/bin/entrypoint.sh"]
