@@ -79,7 +79,6 @@ PGID=${PGID:-1000}
 
 # Get Docker group ID from the docker socket file
 DOCKER_GID=$(stat -c '%g' /var/run/docker.sock 2>/dev/null || echo "999")
-ls -al /var/run/docker.sock
 
 # Ensure group with PGID exists
 if ! getent group "$PGID" >/dev/null; then
