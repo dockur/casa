@@ -173,6 +173,11 @@ filter_logs() {
             continue
         fi
 
+        # Skip systemd warnings
+        if echo "$line" | grep -q "This process is not running as a systemd service."; then
+            continue
+        fi
+
         # Show everything else (actual errors, warnings, important info)
         echo "$line"
     done
