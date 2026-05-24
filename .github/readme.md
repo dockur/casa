@@ -64,6 +64,14 @@ docker run -it --rm --name casa -p 8080:8080 -v "${PWD:-.}/casa:/DATA" -v "/var/
 
   Replace the example path `./casa` with the desired storage folder or named volume.
 
+### How do I run ZimaOS in a container?
+
+  See [dockur/zima](https://github.com/dockur/zima) for a ZimaOS container.
+
+### How do I run UmbrelOS in a container?
+
+  See [dockur/umbrel](https://github.com/dockur/umbrel) for a UmbrelOS container.
+
  # Acknowledgements 🙏
  
 Special thanks to [@worph](https://github.com/worph), this project would not exist without his invaluable work.
