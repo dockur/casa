@@ -188,6 +188,10 @@ RUN corepack enable && corepack prepare pnpm@9.0.6 --activate
 COPY ./CasaOS-UI/package.json .
 COPY ./CasaOS-UI/pnpm-lock.yaml .
 
+# @icewhale/icewhale-files-openapi was removed from npm; redirect to the mirror package
+COPY ./build/patch-casaos-ui.cjs /tmp/patch-casaos-ui.cjs
+RUN node /tmp/patch-casaos-ui.cjs
+
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY ./CasaOS-UI .
