@@ -35,7 +35,13 @@ if ! docker network inspect "$net" &>/dev/null; then
 fi
 
 target=$(hostname -s)
-target=$(docker inspect -f '{{.Name}} {{.Config.Hostname}}' $(docker ps -aq) | awk '$2=="'"$target"'"{print $1}' | tail -c+2)
+ids=($(docker ps -aq))
+
+target=$(
+  docker inspect -f '{{.Name}} {{.Config.Hostname}}' "${ids[@]}" |
+  awk -v t="$target" '$2 == t {print $1}' |
+  tail -c +2
+)
 
 if ! docker inspect "$target" &>/dev/null; then
   error "Failed to find a container with name: '$target'!" && exit 16
