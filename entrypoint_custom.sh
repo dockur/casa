@@ -18,17 +18,19 @@ if [ ! -S /var/run/docker.sock ]; then
 fi
 
 net="casa-net"
-docker network rm "$net" &>/dev/null || true
+subnet="10.22.0.0/16"
 
 export REF_NET="$net"
 export REF_SEPARATOR="-"
 
+docker network rm "$net" &>/dev/null || true
+
 if ! docker network inspect "$net" &>/dev/null; then
-  if ! docker network create --driver=bridge --subnet="10.22.0.0/16" "$net" >/dev/null; then
-    error "Failed to create network '$net'!" && exit 14
+  if ! docker network create --driver=bridge "--subnet=$subnet" "$net" >/dev/null; then
+    error "Failed to create bridge network '$net'!" && exit 14
   fi
   if ! docker network inspect "$net" &>/dev/null; then
-    error "Network '$net' does not exist?" && exit 15
+    error "Bridge network '$net' does not exist?" && exit 15
   fi
 fi
 
@@ -39,11 +41,11 @@ if ! docker inspect "$target" &>/dev/null; then
 fi
 
 resp=$(docker inspect "$target")
-network=$(echo "$resp" | jq -r '.[0].NetworkSettings.Networks["casa-net"]')
+network=$(echo "$resp" | jq -r ".[0].NetworkSettings.Networks[\"$net\"]")
 
 if [ -z "$network" ] || [[ "$network" == "null" ]]; then
   if ! docker network connect "$net" "$target"; then
-    error "Failed to connect container to network '$net'!" && exit 17
+    error "Failed to connect container to bridge network '$net'!" && exit 17
   fi
 fi
 
