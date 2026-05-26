@@ -34,19 +34,21 @@ if ! docker network inspect "$net" &>/dev/null; then
   fi
 fi
 
+# Determine container name
 target=$(hostname -s)
-ids=($(docker ps -aq))
-
 target=$(
-  docker inspect -f '{{.Name}} {{.Config.Hostname}}' "${ids[@]}" |
+  docker ps -aq |
+  xargs docker inspect -f '{{.Name}} {{.Config.Hostname}}' |
   awk -v t="$target" '$2 == t {print $1}' |
   tail -c +2
 )
 
+# Check if container name is valid
 if ! docker inspect "$target" &>/dev/null; then
   error "Failed to find a container with name: '$target'!" && exit 16
 fi
 
+# Connect to bridge network
 resp=$(docker inspect "$target")
 network=$(echo "$resp" | jq -r ".[0].NetworkSettings.Networks[\"$net\"]")
 
