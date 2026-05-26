@@ -34,10 +34,10 @@ if ! docker network inspect "$net" &>/dev/null; then
   fi
 fi
 
-target=$(hostname -s)
+target=$(grep -m1 "containers" /proc/self/mountinfo | sed -E 's#.*/containers/([^/]+)/.*#\1#')
 
 if ! docker inspect "$target" &>/dev/null; then
-  error "Failed to find a container with name: '$target'!" && exit 16
+  error "Failed to find a container with id: '$target'!" && exit 16
 fi
 
 resp=$(docker inspect "$target")
