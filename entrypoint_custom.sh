@@ -40,7 +40,7 @@ target=$(
   docker ps -aq |
   xargs docker inspect -f '{{.Name}} {{.Config.Hostname}}' |
   awk -v t="$target" '$2 == t {print $1}' |
-  tail -c +2
+  tail -c +2 | head -n 1
 )
 
 # Check if container name is valid
