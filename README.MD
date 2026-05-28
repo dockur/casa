@@ -12,6 +12,9 @@ Thanks for sponsoring this project
 ## Sibling project
 [Mesh-Router](https://github.com/worph/mesh-router) - providing easy management of for domain accessible containers and compatible with CasaIMG.
 
+## Looking for ZimaOS?
+If you want a containerized version of **ZimaOS** (the successor to CasaOS with extra features), check out [dockur/zima](https://github.com/dockur/zima). See [#2](https://github.com/worph/casa-img/issues/2) for background.
+
 
 ## Prerequisites
 - Docker must be installed on the host (works on Windows and Linux host)
