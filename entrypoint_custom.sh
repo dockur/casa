@@ -41,6 +41,8 @@ else
   cid=$(grep -m1 "containers" /proc/self/mountinfo | sed -E 's#.*/containers/([^/]+)/.*#\1#')
 fi
 
+target=$(docker inspect -f '{{.Name}}' "$cid" | sed 's#^/##')
+
 # Check if container name is valid
 if ! docker inspect "$target" &>/dev/null; then
   error "Failed to find a container with name: '$target'!" && exit 16
