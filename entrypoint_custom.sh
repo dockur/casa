@@ -10,7 +10,7 @@ trap 'error "Status $? while: $BASH_COMMAND (line $LINENO/$BASH_LINENO)"' ERR
 [ ! -f "/usr/local/bin/entrypoint.sh" ] && error "Script must run inside Docker container!" && exit 11
 [ "$(id -u)" -ne "0" ] && error "Script must be executed with root privileges." && exit 12
 
-echo "❯ Starting CasaOS for Docker v$(</run/version)..."
+echo "❯ Starting CasaOS for Docker v$(</etc/version)..."
 echo "❯ For support visit https://github.com/dockur/casa/issues"
 
 if [ ! -S /var/run/docker.sock ]; then
