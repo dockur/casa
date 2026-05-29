@@ -35,11 +35,9 @@ if ! docker network inspect "$net" &>/dev/null; then
 fi
 
 # Determine container name
-if grep -oE '[0-9a-f]{64}' /proc/self/cgroup; then
-  cid=$(grep -oE '[0-9a-f]{64}' /proc/self/cgroup | head -n1)
-else
-  cid=$(grep -m1 "containers" /proc/self/mountinfo | sed -E 's#.*/containers/([^/]+)/.*#\1#')
-fi
+cid=$(grep -oE '[0-9a-f]{64}' /proc/self/cgroup | head -n1)
+[ -z "$cid" ] && cid=$(grep -m1 "containers" /proc/self/mountinfo | sed -E 's#.*/containers/([^/]+)/.*#\1#')
+[ -z "$cid" ] && error "Failed to get the container CID!" && exit 16
 
 target=$(docker inspect -f '{{.Name}}' "$cid" | sed 's#^/##')
 
