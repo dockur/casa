@@ -299,7 +299,7 @@ RUN set -eu \
   && apt-get --no-install-recommends -y install docker-ce-cli docker-compose-plugin \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-  && echo "$VERSION_ARG" > /run/version
+  && echo "$VERSION_ARG" > /etc/version
 
 # Set environment variables
 ENV GO_ENV=production
