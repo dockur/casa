@@ -21,7 +21,7 @@ cid=""
 name=""
 net="casa-net"
 host=$(hostname -s)
-subnet="10.22.0.0/16"
+subnet="${SUBNET:-10.22.0.0/16}"
 
 export REF_NET="$net"
 export REF_SEPARATOR="-"
@@ -38,7 +38,7 @@ if ! docker network inspect "$net" &>/dev/null; then
 fi
 
 # Determine container name
-cid=$(grep -oE '[0-9a-f]{64}' /proc/self/cgroup | head -n1) || :
+cid=$(grep -oE '[0-9a-f]{12,64}' /proc/self/cgroup | head -n1 || :)
 [ -z "$cid" ] && cid=$(grep -m1 "containers" /proc/self/mountinfo | sed -E 's#.*/containers/([^/]+)/.*#\1#') || :
 
 if [ -n "$cid" ]; then
@@ -57,11 +57,15 @@ fi
 
 # Check if container name is valid
 if ! docker inspect "$name" &>/dev/null; then
-  error "Failed to find a container with name '$name'!" && exit 16
+  error "Failed to find a container with name $name!" && exit 16
 fi
 
+# Inspect the container
+resp=$(docker inspect "$name") || {
+  error "Failed to inspect container $name!" && exit 16
+}
+
 # Connect to bridge network
-resp=$(docker inspect "$name")
 network=$(echo "$resp" | jq -r ".[0].NetworkSettings.Networks[\"$net\"]")
 
 if [ -z "$network" ] || [[ "$network" == "null" ]]; then
