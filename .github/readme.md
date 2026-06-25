@@ -77,7 +77,7 @@ docker run -it --rm --name casa -p 8080:8080 -v "${PWD:-.}/casa:/DATA" -v "/var/
 Special thanks to [@worph](https://github.com/worph), this project would not exist without his invaluable work.
 
 ## Stars 🌟
-[![Stars](https://starchart.cc/dockur/casa.svg?variant=adaptive)](https://starchart.cc/dockur/casa)
+[![Stargazers](https://raw.githubusercontent.com/star-stats/stars/refs/heads/data/charts/dockur-casa.svg)](https://github.com/dockur/casa/stargazers)
 
 [build_url]: https://github.com/dockur/casa/
 [hub_url]: https://hub.docker.com/r/dockurr/casa
