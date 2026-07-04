@@ -26,15 +26,30 @@ subnet="${SUBNET:-10.22.0.0/16}"
 export REF_NET="$net"
 export REF_SEPARATOR="-"
 
-docker network rm "$net" &>/dev/null || true
+current_subnet=""
+
+network_json="$(docker network inspect "$net" 2>/dev/null || true)"
+
+if [ -n "$network_json" ]; then
+  current_subnet="$(jq -r '.[0].IPAM.Config[0].Subnet // ""' <<<"$network_json")"
+fi
+
+if [ -n "$current_subnet" ] && [ "$current_subnet" != "$subnet" ]; then
+  info "Recreating bridge network '$net' because subnet changed from $current_subnet to $subnet..."
+
+  if ! docker network rm "$net" >/dev/null 2>&1; then
+    error "Failed to remove bridge network '$net'. Stop containers using it first." && exit 14
+  fi
+fi
 
 if ! docker network inspect "$net" &>/dev/null; then
   if ! docker network create --driver=bridge "--subnet=$subnet" "$net" >/dev/null; then
     error "Failed to create bridge network '$net'!" && exit 14
   fi
-  if ! docker network inspect "$net" &>/dev/null; then
-    error "Bridge network '$net' does not exist?" && exit 15
-  fi
+fi
+
+if ! docker network inspect "$net" &>/dev/null; then
+  error "Bridge network '$net' does not exist?" && exit 15
 fi
 
 # Determine container name
@@ -93,9 +108,20 @@ fi
 
 # Mirror external folder to local filesystem
 if [[ "$mount" != "/DATA" ]]; then
-  mkdir -p "$mount"
-  rm -rf "$mount"
-  ln -s /DATA "$mount"
+
+  case "$mount" in
+    ""|"/"|"/DATA"|"/data"|"/proc"|"/sys"|"/dev"|"/run"|"/tmp"|"/var"|"/etc"|"/usr"|"/opt"|"/home")
+      error "Refusing to replace unsafe mount path: $mount" && exit 20
+      ;;
+  esac
+
+  if [ -e "$mount" ] && [ ! -L "$mount" ]; then
+    error "Mount path already exists and is not a symlink: $mount" && exit 21
+  fi
+
+mkdir -p "$(dirname "$mount")"
+rm -f "$mount"
+ln -s /DATA "$mount"
 fi
 
 export DATA_ROOT="$mount"
