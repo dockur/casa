@@ -28,11 +28,10 @@ export REF_SEPARATOR="-"
 
 current_subnet=""
 
-if docker network inspect "$net" &>/dev/null; then
-  current_subnet="$(
-    docker network inspect "$net" |
-      jq -r '.[0].IPAM.Config[0].Subnet // ""'
-  )"
+network_json="$(docker network inspect "$net" 2>/dev/null || true)"
+
+if [ -n "$network_json" ]; then
+  current_subnet="$(jq -r '.[0].IPAM.Config[0].Subnet // ""' <<<"$network_json")"
 fi
 
 if [ -n "$current_subnet" ] && [ "$current_subnet" != "$subnet" ]; then
