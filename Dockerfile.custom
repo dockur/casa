@@ -290,16 +290,50 @@ ARG DEBCONF_NOWARNINGS="yes"
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 
-RUN set -eu \
-  && apt-get update -y \
-  && apt-get --no-install-recommends -y install jq tini gnupg rclone wget gosu curl smartmontools e2fsprogs parted ntfs-3g net-tools iputils-ping udevil samba cifs-utils mergerfs zip unzip openssh-server ca-certificates \
-  && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg \
-  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
-  && apt-get update -y \
-  && apt-get --no-install-recommends -y install docker-ce-cli docker-compose-plugin \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-  && echo "$VERSION_ARG" > /etc/version
+RUN <<EOF
+  set -eu
+
+  apt-get update -y
+  apt-get --no-install-recommends -y install \
+    jq \
+    tini \
+    gnupg \
+    rclone \
+    wget \
+    gosu \
+    curl \
+    smartmontools \
+    e2fsprogs \
+    parted \
+    ntfs-3g \
+    net-tools \
+    iputils-ping \
+    udevil \
+    samba \
+    cifs-utils \
+    mergerfs \
+    zip \
+    unzip \
+    openssh-server \
+    ca-certificates
+
+  # Add Docker repository
+  curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian trixie stable" > /etc/apt/sources.list.d/docker.list
+
+  # Install Docker client
+  apt-get update -y
+  apt-get --no-install-recommends -y install \
+    docker-ce-cli \
+    docker-compose-plugin
+
+  apt-get clean
+
+  # Set version file
+  echo "$VERSION_ARG" > /etc/version
+
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+EOF
 
 # Set environment variables
 ENV GO_ENV=production
