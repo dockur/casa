@@ -119,8 +119,9 @@ if [[ "$mount" != "/DATA" ]]; then
     error "Mount path already exists and is not a symlink: $mount" && exit 21
   fi
 
-  rm -f "$mount"
-  ln -s /DATA "$mount"
+mkdir -p "$(dirname "$mount")"
+rm -f "$mount"
+ln -s /DATA "$mount"
 fi
 
 export DATA_ROOT="$mount"
