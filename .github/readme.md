@@ -11,11 +11,13 @@
 
 </div></h1>
 
-Docker container of [CasaOS](https://casaos.io/) (an OS for self-hosting).
+Docker container of [CasaOS](https://casaos.io/), an OS for self-hosting.
 
 ## Features ✨
 
-* Run CasaOS without the need to install it on your system!
+- Does not need dedicated hardware or a virtual machine
+- Provides access to the CasaOS web interface
+- Supports installing and running CasaOS apps
 
 ## Usage  🐳
 
