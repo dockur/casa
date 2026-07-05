@@ -15,9 +15,11 @@ Docker container of [CasaOS](https://casaos.io/), an OS for self-hosting.
 
 ## Features ✨
 
+- Runs CasaOS inside a Docker container
 - Does not need dedicated hardware or a virtual machine
 - Provides access to the CasaOS web interface
 - Supports installing and running CasaOS apps
+- Uses the host Docker daemon for app containers
 
 ## Usage  🐳
 
