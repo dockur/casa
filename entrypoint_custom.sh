@@ -25,6 +25,8 @@ checkEnvironment() {
 configureReferenceNetwork() {
   export REF_NET="$net"
   export REF_SEPARATOR="-"
+
+  return 0
 }
 
 configureNetwork() {
@@ -175,6 +177,8 @@ mirrorDataMount() {
 
 configureDataRoot() {
   export DATA_ROOT="$mount"
+
+  return 0
 }
 
 configureIdentity() {
@@ -364,6 +368,8 @@ runRegisterUiEvents() {
   # Run the register UI events script
   chown -R "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
   gosu "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
+
+  return 0
 }
 
 configureRclone() {
@@ -373,6 +379,8 @@ configureRclone() {
 
   # Ensure rclone socket has correct permissions
   chown "$PUID:$PGID" /var/run/rclone/rclone.sock
+
+  return 0
 }
 
 startSamba() {
@@ -384,6 +392,8 @@ startSamba() {
       smbd -i --debug-stdout || true
     fi
   fi
+
+  return 0
 }
 
 tailLogs() {
