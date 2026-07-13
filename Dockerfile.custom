@@ -306,6 +306,7 @@ RUN <<EOF
     tini \
     gnupg \
     rclone \
+    socat \
     wget \
     gosu \
     curl \
