@@ -279,6 +279,26 @@ configureIdentity() {
   return 0
 }
 
+checkDataPermissions() {
+
+  local test_file="/DATA/.casa-write-test.$$"
+
+  # Verify that the container can write to the data folder
+  if ! (umask 077 && : > "$test_file") 2>/dev/null; then
+    error "The /DATA folder is not writable!" && exit 22
+  fi
+
+  rm -f "$test_file"
+
+  # Docker creates a new bind-mounted directory as root. Assign an empty
+  # directory to the configured user, but never change ownership of existing data.
+  if [ -z "$(find /DATA -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
+    chown "$PUID:$PGID" /DATA 2>/dev/null || :
+  fi
+
+  return 0
+}
+
 prepareDirectories() {
 
   # Create necessary directories with proper ownership
@@ -287,8 +307,7 @@ prepareDirectories() {
   mkdir -p /var/log/casaos
   mkdir -p /var/run/casaos
 
-  # Set ownership of directories that will be used by casaos processes
-  chown -R "$PUID:$PGID" /DATA/
+  # Set ownership of directories that will be used by CasaOS processes
   chown -R "$PUID:$PGID" /c/DATA/
   chown -R "$PUID:$PGID" /var/log/casaos
   chown -R "$PUID:$PGID" /var/run/casaos
@@ -518,6 +537,7 @@ normalizeMountPath
 mirrorDataMount
 configureDataRoot
 configureIdentity
+checkDataPermissions
 prepareDirectories
 prepareLogs
 startCasaServices
