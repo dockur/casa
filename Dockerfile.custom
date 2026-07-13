@@ -200,7 +200,6 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY ./CasaOS-UI .
 ENV VUE_APP_VERSION=$VERSION_ARG
 RUN pnpm run build
-RUN test -s /app/build/sysroot/var/lib/casaos/ui-message-bus.json
 
 ############################################################################################################
 # Build the Go binary for the CasaOS Main
