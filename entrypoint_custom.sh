@@ -531,7 +531,7 @@ startCasaServices() {
 
 runRegisterUiEvents() {
 
-  # Register the UI event definitions with the MessageBus
+  # Run the register UI events script
   gosu "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
 
   return 0
