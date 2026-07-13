@@ -485,30 +485,41 @@ waitForRoutes() {
 configureRclone() {
 
   local socket="/var/run/rclone/rclone.sock"
+  local address="127.0.0.1:5572"
   local log_file="/var/log/casaos-rclone.log"
 
-  # Start the rclone remote-control daemon used by CasaOS network mounts
+  # CasaOS connects to rclone through a Unix socket, while the packaged
+  # rclone version only supports a TCP address for its remote-control server.
   install -d -o "$PUID" -g "$PGID" /var/run/rclone
   rm -f "$socket"
 
   gosu "$PUID:$PGID" rclone rcd \
-    --rc-addr "$socket" \
+    --rc-addr "$address" \
     --rc-no-auth \
     --rc-allow-origin "*" \
     > "$log_file" 2>&1 &
 
   service_pids["rclone"]=$!
 
-  # Wait until rclone creates its Unix socket
+  gosu "$PUID:$PGID" socat \
+    "UNIX-LISTEN:$socket,fork,mode=0600" \
+    "TCP:$address" \
+    >> "$log_file" 2>&1 &
+
+  service_pids["rclone-proxy"]=$!
+
+  # Wait until socat creates the Unix socket
   while [ ! -S "$socket" ]; do
     if ! kill -0 "${service_pids[rclone]}" 2>/dev/null; then
       error "The rclone service failed to start."
-
-      if [ -s "$log_file" ]; then
-        cat "$log_file" >&2
-      fi
-
+      [ -s "$log_file" ] && cat "$log_file" >&2
       exit 27
+    fi
+
+    if ! kill -0 "${service_pids[rclone-proxy]}" 2>/dev/null; then
+      error "The rclone socket proxy failed to start."
+      [ -s "$log_file" ] && cat "$log_file" >&2
+      exit 28
     fi
 
     info "Waiting for the rclone service to start..."
