@@ -199,7 +199,14 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY ./CasaOS-UI .
 ENV VUE_APP_VERSION=$VERSION_ARG
-RUN pnpm run build
+
+# Fix output paths used by the external CasaOS-UI repository
+RUN sed -i \
+      -e 's#\.\./build/sysroot/var/lib/casaos/#./build/sysroot/var/lib/casaos/#' \
+      -e 's#\.\./build/sysroot/etc/casaos/start.d/#./build/sysroot/etc/casaos/start.d/#' \
+      message_bus.build.js && \
+    pnpm run build && \
+    test -s /app/build/sysroot/var/lib/casaos/ui-message-bus.json
 
 ############################################################################################################
 # Build the Go binary for the CasaOS Main
