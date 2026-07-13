@@ -5,7 +5,54 @@ info () { printf "%b%s%b" "\E[1;34m❯ \E[1;36m" "${1:-}" "\E[0m\n"; }
 error () { printf "%b%s%b" "\E[1;31m❯ " "ERROR: ${1:-}" "\E[0m\n" >&2; }
 warn () { printf "%b%s%b" "\E[1;31m❯ " "Warning: ${1:-}" "\E[0m\n" >&2; }
 
+tail_pid=""
+shutting_down="N"
+
+shutdown() {
+
+  local uid="${PUID:-1000}"
+  local deadline=$((SECONDS + 50))
+
+  if [[ "$shutting_down" == "Y" ]]; then
+    return 0
+  fi
+
+  shutting_down="Y"
+  trap - ERR INT TERM HUP
+
+  info "Shutting down CasaOS services..."
+
+  # Stop the foreground logging process
+  if [ -n "$tail_pid" ] && kill -0 "$tail_pid" 2>/dev/null; then
+    kill -TERM "$tail_pid" 2>/dev/null || :
+  fi
+
+  # Stop all CasaOS processes and Samba gracefully
+  pkill -TERM -U "$uid" 2>/dev/null || :
+  pkill -TERM -x smbd 2>/dev/null || :
+
+  # Allow services up to 50 seconds to exit cleanly
+  while (( SECONDS < deadline )); do
+    if ! pgrep -U "$uid" >/dev/null 2>&1 &&
+       ! pgrep -x smbd >/dev/null 2>&1; then
+      break
+    fi
+
+    sleep 1
+  done
+
+  # Force-stop any processes that ignored SIGTERM
+  pkill -KILL -U "$uid" 2>/dev/null || :
+  pkill -KILL -x smbd 2>/dev/null || :
+
+  wait 2>/dev/null || :
+
+  info "CasaOS services stopped."
+  exit 0
+}
+
 trap 'error "Status $? while: $BASH_COMMAND (line $LINENO/$BASH_LINENO)"' ERR
+trap shutdown INT TERM HUP
 
 [ ! -f "/usr/local/bin/entrypoint.sh" ] && error "Script must run inside Docker container!" && exit 11
 [ "$(id -u)" -ne "0" ] && error "Script must be executed with root privileges." && exit 12
@@ -568,8 +615,7 @@ tailLogs() {
 
   trap - ERR
 
-  # Tail the log files to keep the container running and to display the logs in stdout
-  # Now the logs are already filtered at the file level
+  # Run tail in the background so the shell can handle signals
   tail -f \
     /var/log/casaos-gateway.log \
     /var/log/casaos-app-management.log \
@@ -577,7 +623,10 @@ tailLogs() {
     /var/log/casaos-message-bus.log \
     /var/log/casaos-local-storage.log \
     /var/log/casaos-main.log \
-    /var/log/casaos-rclone.log
+    /var/log/casaos-rclone.log &
+
+  tail_pid=$!
+  wait "$tail_pid"
 }
 
 checkEnvironment
