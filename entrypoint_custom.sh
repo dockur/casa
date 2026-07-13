@@ -22,7 +22,21 @@ checkEnvironment() {
   return 0
 }
 
+checkDocker() {
+
+  if ! docker info >/dev/null 2>&1; then
+    error "Failed to connect to the Docker daemon through /var/run/docker.sock." && exit 22
+  fi
+
+  if ! docker compose version >/dev/null 2>&1; then
+    error "Docker Compose is not available. Please install the Docker Compose plugin." && exit 23
+  fi
+
+  return 0
+}
+
 configureReferenceNetwork() {
+
   export REF_NET="$net"
   export REF_SEPARATOR="-"
 
@@ -30,6 +44,7 @@ configureReferenceNetwork() {
 }
 
 configureNetwork() {
+
   local current_subnet=""
   local network_json=""
 
@@ -61,6 +76,7 @@ configureNetwork() {
 }
 
 detectContainerId() {
+
   cid=$(grep -oE '[0-9a-f]{12,64}' /proc/self/cgroup | head -n1 || :)
   [ -z "$cid" ] && cid=$(grep -m1 "containers" /proc/self/mountinfo | sed -E 's#.*/containers/([^/]+)/.*#\1#') || :
 
@@ -68,42 +84,51 @@ detectContainerId() {
 }
 
 detectContainerNameFromId() {
-  if [ -n "$cid" ]; then
-    name=$(docker inspect -f '{{.Name}}' "$cid" 2>/dev/null | sed 's#^/##') || :
-    [ -z "$name" ] && name="$cid"
-  fi
+
+  [ -z "$cid" ] && return 0
+
+  name=$(docker inspect -f '{{.Name}}' "$cid" 2>/dev/null | sed 's#^/##') || :
+  [ -z "$name" ] && name="$cid"
 
   return 0
 }
 
 detectContainerNameFromHostname() {
-  if [ -z "$name" ]; then
-    name=$(
-      docker ps -q |
-      xargs -r docker inspect --format '{{.Name}} {{.Config.Hostname}}' |
-      awk -v t="$host" '$2 == t { print substr($1, 2); exit }'
-    ) || :
-    [ -z "$name" ] && name="$host"
+
+  local matches=()
+
+  [ -n "$name" ] && return 0
+
+  mapfile -t matches < <(
+    docker ps -q |
+    xargs -r docker inspect --format '{{.Name}} {{.Config.Hostname}}' |
+    awk -v target="$host" '$2 == target { print substr($1, 2) }'
+  )
+
+  if [ "${#matches[@]}" -eq 1 ]; then
+    name="${matches[0]}"
   fi
 
   return 0
 }
 
 detectContainerName() {
+
   # Determine container name
   detectContainerId
   detectContainerNameFromId
   detectContainerNameFromHostname
 
   # Check if container name is valid
-  if ! docker inspect "$name" &>/dev/null; then
-    error "Failed to find a container with name $name!" && exit 16
+  if [ -z "$name" ] || ! docker inspect "$name" &>/dev/null; then
+    error "Failed to identify the current container!" && exit 16
   fi
 
   return 0
 }
 
 inspectContainer() {
+
   # Inspect the container
   resp=$(docker inspect "$name") || {
     error "Failed to inspect container $name!" && exit 16
@@ -112,11 +137,57 @@ inspectContainer() {
   return 0
 }
 
+imageRepository() {
+
+  local image="${1%%@*}"
+
+  # Remove the tag from the final path component while preserving a registry port
+  sed -E 's#:[^/:]+$##' <<<"$image"
+
+  return 0
+}
+
+checkOtherInstance() {
+
+  local container=""
+  local container_image=""
+  local container_name=""
+  local container_repo=""
+  local current_image=""
+  local current_repo=""
+  local other=""
+
+  current_image=$(jq -r '.[0].Config.Image // ""' <<<"$resp")
+  current_repo=$(imageRepository "$current_image")
+
+  while read -r container; do
+    [ -z "$container" ] && continue
+
+    container_name=$(docker inspect -f '{{.Name}}' "$container" 2>/dev/null | sed 's#^/##') || continue
+    [ "$container_name" = "$name" ] && continue
+
+    container_image=$(docker inspect -f '{{.Config.Image}}' "$container" 2>/dev/null) || continue
+    container_repo=$(imageRepository "$container_image")
+
+    if [ -n "$current_repo" ] && [ "$container_repo" = "$current_repo" ]; then
+      other="$container_name"
+      break
+    fi
+  done < <(docker ps -q)
+
+  if [ -n "$other" ]; then
+    error "Another CasaOS container is already running: $other" && exit 24
+  fi
+
+  return 0
+}
+
 connectNetwork() {
+
   local network
 
   # Connect to bridge network
-  network=$(echo "$resp" | jq -r ".[0].NetworkSettings.Networks[\"$net\"]")
+  network=$(jq -r ".[0].NetworkSettings.Networks[\"$net\"]" <<<"$resp")
 
   if [ -z "$network" ] || [[ "$network" == "null" ]]; then
     if ! docker network connect "$net" "$name"; then
@@ -128,7 +199,8 @@ connectNetwork() {
 }
 
 detectDataMount() {
-  mount=$(echo "$resp" | jq -r '.[0].Mounts[] | select(.Destination == "/DATA").Source')
+
+  mount=$(jq -r '.[0].Mounts[] | select(.Destination == "/DATA").Source' <<<"$resp")
 
   if [ -z "$mount" ] || [[ "$mount" == "null" ]] || [ ! -d "/DATA" ]; then
     error "You did not bind the /DATA folder!" && exit 18
@@ -138,6 +210,7 @@ detectDataMount() {
 }
 
 normalizeMountPath() {
+
   # Convert Windows paths to Linux path
   if [[ "$mount" == *":\\"* ]]; then
     mount="${mount,,}"
@@ -153,6 +226,7 @@ normalizeMountPath() {
 }
 
 mirrorDataMount() {
+
   # Mirror external folder to local filesystem
   if [[ "$mount" == "/DATA" ]]; then
     return 0
@@ -164,24 +238,27 @@ mirrorDataMount() {
       ;;
   esac
 
+  mkdir -p "$(dirname -- "$mount")"
+
   if [ -e "$mount" ] && [ ! -L "$mount" ]; then
     error "Mount path already exists and is not a symlink: $mount" && exit 21
   fi
 
-  mkdir -p "$(dirname "$mount")"
-  rm -f "$mount"
+  rm -f -- "$mount"
   ln -s /DATA "$mount"
 
   return 0
 }
 
 configureDataRoot() {
+
   export DATA_ROOT="$mount"
 
   return 0
 }
 
 configureIdentity() {
+
   # Get UID/GID from environment variables (default to 1000 if not set)
   PUID=${PUID:-1000}
   PGID=${PGID:-1000}
@@ -202,15 +279,35 @@ configureIdentity() {
   return 0
 }
 
+checkDataPermissions() {
+
+  local test_file="/DATA/.casa-write-test.$$"
+
+  # Verify that the container can write to the data folder
+  if ! (umask 077 && : > "$test_file") 2>/dev/null; then
+    error "The /DATA folder is not writable!" && exit 22
+  fi
+
+  rm -f "$test_file"
+
+  # Docker creates a new bind-mounted directory as root. Assign an empty
+  # directory to the configured user, but never change ownership of existing data.
+  if [ -z "$(find /DATA -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
+    chown "$PUID:$PGID" /DATA 2>/dev/null || :
+  fi
+
+  return 0
+}
+
 prepareDirectories() {
+
   # Create necessary directories with proper ownership
   mkdir -p /DATA/AppData/casaos/apps
   mkdir -p /c/DATA/ # For compatibility with windows host
   mkdir -p /var/log/casaos
   mkdir -p /var/run/casaos
 
-  # Set ownership of directories that will be used by casaos processes
-  chown -R "$PUID:$PGID" /DATA/
+  # Set ownership of directories that will be used by CasaOS processes
   chown -R "$PUID:$PGID" /c/DATA/
   chown -R "$PUID:$PGID" /var/log/casaos
   chown -R "$PUID:$PGID" /var/run/casaos
@@ -220,6 +317,7 @@ prepareDirectories() {
 }
 
 prepareLogs() {
+
   # Create log files with proper ownership
   touch /var/log/casaos-gateway.log
   touch /var/log/casaos-app-management.log
@@ -235,6 +333,7 @@ prepareLogs() {
 
 # Define comprehensive log filter function
 filter_logs() {
+
   local service_name="$1"
 
   while IFS= read -r line; do
@@ -304,6 +403,7 @@ filter_logs() {
 }
 
 startService() {
+
   local service_name="$1"
   local command="$2"
   local group="${3:-$PGID}"
@@ -313,6 +413,7 @@ startService() {
 }
 
 waitForFile() {
+
   local file="$1"
   local service_name="$2"
 
@@ -323,6 +424,7 @@ waitForFile() {
 }
 
 waitForRoutes() {
+
   # Wait for /var/run/casaos/routes.json to be created and contains local_storage
   while [ ! -f /var/run/casaos/routes.json ] || ! grep -q "local_storage" /var/run/casaos/routes.json; do
     info "Waiting for routes to be created..."
@@ -331,6 +433,7 @@ waitForRoutes() {
 }
 
 startCasaServices() {
+
   # Start the Gateway service with filtering
   startService "gateway" "/usr/local/bin/casaos-gateway"
 
@@ -365,6 +468,7 @@ startCasaServices() {
 }
 
 runRegisterUiEvents() {
+
   # Run the register UI events script
   chown -R "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
   gosu "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
@@ -373,6 +477,7 @@ runRegisterUiEvents() {
 }
 
 configureRclone() {
+
   # Configure rclone
   mkdir -p /var/run/rclone
   touch /var/run/rclone/rclone.sock
@@ -384,6 +489,7 @@ configureRclone() {
 }
 
 startSamba() {
+
   : "${SAMBA:="Y"}"
 
   if [[ "$SAMBA" != [Nn]* ]]; then
@@ -397,6 +503,7 @@ startSamba() {
 }
 
 tailLogs() {
+
   trap - ERR
 
   # Tail the log files to keep the container running and to display the logs in stdout
@@ -411,6 +518,7 @@ tailLogs() {
 }
 
 checkEnvironment
+checkDocker
 
 cid=""
 name=""
@@ -419,15 +527,17 @@ host=$(hostname -s)
 subnet="${SUBNET:-10.22.0.0/16}"
 
 configureReferenceNetwork
-configureNetwork
 detectContainerName
 inspectContainer
+checkOtherInstance
+configureNetwork
 connectNetwork
 detectDataMount
 normalizeMountPath
 mirrorDataMount
 configureDataRoot
 configureIdentity
+checkDataPermissions
 prepareDirectories
 prepareLogs
 startCasaServices
