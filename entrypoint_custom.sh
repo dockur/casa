@@ -484,17 +484,36 @@ waitForRoutes() {
 
 configureRclone() {
 
+  local socket="/var/run/rclone/rclone.sock"
+  local log_file="/var/log/casaos-rclone.log"
+
   # Start the rclone remote-control daemon used by CasaOS network mounts
   install -d -o "$PUID" -g "$PGID" /var/run/rclone
-  rm -f /var/run/rclone/rclone.sock
+  rm -f "$socket"
 
   gosu "$PUID:$PGID" rclone rcd \
-    --rc-addr unix:///var/run/rclone/rclone.sock \
+    --rc-addr "$socket" \
     --rc-no-auth \
     --rc-allow-origin "*" \
-    > /var/log/casaos-rclone.log 2>&1 &
+    > "$log_file" 2>&1 &
 
   service_pids["rclone"]=$!
+
+  # Wait until rclone creates its Unix socket
+  while [ ! -S "$socket" ]; do
+    if ! kill -0 "${service_pids[rclone]}" 2>/dev/null; then
+      error "The rclone service failed to start."
+
+      if [ -s "$log_file" ]; then
+        cat "$log_file" >&2
+      fi
+
+      exit 27
+    fi
+
+    info "Waiting for the rclone service to start..."
+    sleep 1
+  done
 
   return 0
 }
