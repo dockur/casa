@@ -324,6 +324,7 @@ prepareLogs() {
   touch /var/log/casaos-message-bus.log
   touch /var/log/casaos-local-storage.log
   touch /var/log/casaos-main.log
+  touch /var/log/casaos-rclone.log
 
   chown "$PUID:$PGID" /var/log/casaos-*.log
 
@@ -458,7 +459,7 @@ waitForFile() {
 waitForRoutes() {
 
   local log_file="/var/log/casaos-local-storage.log"
-  local pid="${service_pids[local-storage]:-}"
+  local pid="${service_pids["local-storage"]:-}"
 
   # Wait for /var/run/casaos/routes.json to be created and contain local_storage
   while [ ! -f /var/run/casaos/routes.json ] ||
@@ -477,6 +478,23 @@ waitForRoutes() {
     info "Waiting for routes to be created..."
     sleep 1
   done
+
+  return 0
+}
+
+configureRclone() {
+
+  # Start the rclone remote-control daemon used by CasaOS network mounts
+  install -d -o "$PUID" -g "$PGID" /var/run/rclone
+  rm -f /var/run/rclone/rclone.sock
+
+  gosu "$PUID:$PGID" rclone rcd \
+    --rc-addr unix:///var/run/rclone/rclone.sock \
+    --rc-no-auth \
+    --rc-allow-origin "*" \
+    > /var/log/casaos-rclone.log 2>&1 &
+
+  service_pids["rclone"]=$!
 
   return 0
 }
@@ -514,20 +532,7 @@ startCasaServices() {
 runRegisterUiEvents() {
 
   # Run the register UI events script
-  chown -R "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
   gosu "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
-
-  return 0
-}
-
-configureRclone() {
-
-  # Configure rclone
-  mkdir -p /var/run/rclone
-  touch /var/run/rclone/rclone.sock
-
-  # Ensure rclone socket has correct permissions
-  chown "$PUID:$PGID" /var/run/rclone/rclone.sock
 
   return 0
 }
@@ -558,7 +563,8 @@ tailLogs() {
     /var/log/casaos-user-service.log \
     /var/log/casaos-message-bus.log \
     /var/log/casaos-local-storage.log \
-    /var/log/casaos-main.log
+    /var/log/casaos-main.log \
+    /var/log/casaos-rclone.log
 }
 
 checkEnvironment
@@ -586,8 +592,8 @@ checkDataPermissions
 prepareDirectories
 prepareLogs
 prepareRuntime
+configureRclone
 startCasaServices
 runRegisterUiEvents
-configureRclone
 startSamba
 tailLogs
