@@ -531,14 +531,7 @@ startCasaServices() {
 
 runRegisterUiEvents() {
 
-  local message_bus_url="/var/run/casaos/message-bus.url"
-  local ui_events="/var/lib/casaos/ui-message-bus.json"
-
-  # Older UI builds do not include event registration metadata
-  if [ ! -s "$message_bus_url" ] || [ ! -s "$ui_events" ]; then
-    return 0
-  fi
-
+  # Register the UI event definitions with the MessageBus
   gosu "$PUID:$PGID" /usr/local/bin/register-ui-events.sh
 
   return 0
