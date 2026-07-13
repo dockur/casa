@@ -305,8 +305,6 @@ RUN <<EOF
     jq \
     tini \
     gnupg \
-    rclone \
-    socat \
     wget \
     gosu \
     curl \
@@ -324,6 +322,21 @@ RUN <<EOF
     unzip \
     openssh-server \
     ca-certificates
+
+  arch="$(dpkg --print-architecture)"
+
+  case "$arch" in
+    amd64) rclone_arch="amd64" ;;
+    arm64) rclone_arch="arm64" ;;
+    armhf) rclone_arch="arm-v7" ;;
+    *) echo "Unsupported architecture for rclone: $arch" >&2 && exit 1 ;;
+  esac
+
+  # Install rclone v1.61.1
+  wget -q "https://downloads.rclone.org/v1.61.1/rclone-v1.61.1-linux-${rclone_arch}.zip" -O /tmp/rclone.zip
+  unzip -q /tmp/rclone.zip -d /tmp
+  install -m 0755 "/tmp/rclone-v1.61.1-linux-${rclone_arch}/rclone" /usr/local/bin/rclone
+  rm -rf /tmp/rclone*
 
   # Add Docker repository
   curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
