@@ -25,7 +25,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix c
 
 # default config
 COPY ./CasaOS-Gateway/build/sysroot/etc/casaos/gateway.ini.sample /etc/casaos/gateway.ini
-RUN mkdir -p /var/run/casaos/ && echo -n "{}" >> /var/run/casaos/routes.json
+RUN mkdir -p /var/run/casaos/ && printf '%s' '{}' >> /var/run/casaos/routes.json
 
 ############################################################################################################
 # Build the Go binary for the User Service
