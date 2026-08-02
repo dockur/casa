@@ -1,6 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":disableDependencyDashboard"],
+  "extends": [
+    "config:recommended",
+    ":disableDependencyDashboard"
+  ],
   "forkProcessing": "enabled",
   "dockerfile": {
     "enabled": false
@@ -10,5 +13,24 @@
   },
    "ignorePaths": [
       ".github/workflows/docker-publish.yml"
+  ],
+  "packageRules": [
+    {
+      "description": "Do not update the Go module version",
+      "matchDatasources": [
+        "golang-version"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Do not update the Go Docker image",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "golang"
+      ],
+      "enabled": false
+    }
   ]
 }
