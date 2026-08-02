@@ -22,7 +22,7 @@ jobs:
               SHELLCHECK_OPTS: -x
           -
             name: Lint Dockerfile
-            uses: hadolint/hadolint-action@v3.3.0
+            uses: hadolint/hadolint-action@v3.4.0
             with:
               dockerfile: Dockerfile.custom
               ignore: DL3008,DL3062,DL4006,DL4001
